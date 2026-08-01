@@ -1,0 +1,330 @@
+import { useState } from 'react'
+
+const tabs = [
+  { id: 'inscription', label: "Inscription & Cotisations" },
+  { id: 'installation', label: "Règles d'Installation" },
+  { id: 'juridique', label: "Modèles Juridiques" },
+  { id: 'attestations', label: "Mes Attestations" },
+]
+
+const services = [
+  {
+    icon: '📋',
+    title: "Inscription au Tableau",
+    desc: "Procédure complète d'inscription, pièces justificatives requises, délais de traitement.",
+    badge: "Démarche",
+    badgeColor: '#E8EDF5',
+    badgeText: '#2A3E6B',
+  },
+  {
+    icon: '💳',
+    title: "Cotisations Annuelles",
+    desc: "Paiement en ligne sécurisé, suivi de vos règlements, téléchargement des reçus fiscaux.",
+    badge: "Finance",
+    badgeColor: '#E8F5EC',
+    badgeText: '#2A6B3E',
+  },
+  {
+    icon: '🏢',
+    title: "Ouverture de Cabinet",
+    desc: "Dossier de création, normes d'équipement obligatoires, autorisation d'exercice en libéral.",
+    badge: "Installation",
+    badgeColor: '#FEF3E8',
+    badgeText: '#875A00',
+  },
+  {
+    icon: '📄',
+    title: "Contrats & Modèles",
+    desc: "Bibliothèque de modèles : contrat de collaboration, contrat de remplacement, bail professionnel.",
+    badge: "Juridique",
+    badgeColor: '#FDEADE',
+    badgeText: '#C4622D',
+  },
+  {
+    icon: '🔖',
+    title: "Attestations & Certificats",
+    desc: "Attestation d'inscription, certificat de bonne conduite, relevé de formation DPC.",
+    badge: "Documents",
+    badgeColor: '#F3E8FE',
+    badgeText: '#6B2A9B',
+  },
+  {
+    icon: '📣',
+    title: "Publicité Professionnelle",
+    desc: "Règles de communication autorisée, signalétique, référencement sur l'annuaire officiel.",
+    badge: "Déontologie",
+    badgeColor: '#E8F0FE',
+    badgeText: '#1A3D8B',
+  },
+]
+
+const cotisations = [
+  { category: 'Chirurgien-Dentiste libéral', montant: '75 000 FCFA', echeance: '31 Mars 2025', statut: 'À jour' },
+  { category: 'Salarié secteur public', montant: '50 000 FCFA', echeance: '31 Mars 2025', statut: 'À jour' },
+  { category: 'Salarié secteur privé', montant: '60 000 FCFA', echeance: '31 Mars 2025', statut: 'En attente' },
+  { category: 'Exercice mixte', montant: '85 000 FCFA', echeance: '31 Mars 2025', statut: 'À jour' },
+]
+
+export default function PraticienPage() {
+  const [activeTab, setActiveTab] = useState('inscription')
+
+  return (
+    <div style={{ fontFamily: 'var(--font-body)' }}>
+      {/* Header */}
+      <div style={{ backgroundColor: '#0C4A5A' }} className="px-6 py-16">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90C4A0' }}>
+            Espace Professionnel
+          </p>
+          <h1
+            className="text-4xl md:text-5xl font-bold text-white mb-4"
+            style={{ fontFamily: 'var(--font-heading)' }}
+          >
+            Espace Praticien
+          </h1>
+          <p className="text-white/65 text-lg max-w-2xl">
+            Gérez vos démarches administratives, accédez aux ressources juridiques et réglementaires de la profession.
+          </p>
+        </div>
+      </div>
+
+      {/* Alert */}
+      <div
+        className="px-6 py-3 text-sm flex items-center gap-3"
+        style={{ backgroundColor: '#FEF3E8', borderBottom: '1px solid #F6D5AF' }}
+      >
+        <div className="max-w-7xl mx-auto w-full flex items-center gap-3">
+          <span>⚠️</span>
+          <span style={{ color: '#875A00' }}>
+            <strong>Rappel :</strong> La date limite de renouvellement de cotisation 2025 est le 31 mars. Après cette date, des pénalités s'appliquent.
+          </span>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Services grid */}
+        <div className="mb-16">
+          <h2 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
+            Vos services en ligne
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {services.map((s) => (
+              <div
+                key={s.title}
+                className="p-6 rounded-xl cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition-all group"
+                style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="text-2xl">{s.icon}</div>
+                  <span
+                    className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: s.badgeColor, color: s.badgeText }}
+                  >
+                    {s.badge}
+                  </span>
+                </div>
+                <h3 className="font-semibold text-sm mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+                  {s.title}
+                </h3>
+                <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--muted-foreground)' }}>
+                  {s.desc}
+                </p>
+                <span className="text-xs font-semibold group-hover:underline" style={{ color: 'var(--primary)' }}>
+                  Accéder →
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tabs section */}
+        <div>
+          <div className="flex gap-1 p-1 rounded-xl mb-8 flex-wrap" style={{ backgroundColor: 'var(--muted)' }}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className="px-4 py-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                style={{
+                  backgroundColor: activeTab === tab.id ? 'var(--card)' : 'transparent',
+                  color: activeTab === tab.id ? 'var(--primary)' : 'var(--muted-foreground)',
+                  boxShadow: activeTab === tab.id ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === 'inscription' && (
+            <div>
+              <h3 className="text-xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+                Barème des Cotisations 2025
+              </h3>
+              <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--border)' }}>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr style={{ backgroundColor: 'var(--primary)', color: 'white' }}>
+                      <th className="text-left px-6 py-3.5 text-xs font-semibold">Catégorie</th>
+                      <th className="text-left px-6 py-3.5 text-xs font-semibold">Montant</th>
+                      <th className="text-left px-6 py-3.5 text-xs font-semibold">Échéance</th>
+                      <th className="text-left px-6 py-3.5 text-xs font-semibold">Statut</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cotisations.map((row, i) => (
+                      <tr
+                        key={row.category}
+                        style={{ backgroundColor: i % 2 === 0 ? 'var(--card)' : 'var(--muted)' }}
+                      >
+                        <td className="px-6 py-4 font-medium text-sm">{row.category}</td>
+                        <td className="px-6 py-4 font-semibold text-sm" style={{ color: 'var(--primary)' }}>
+                          {row.montant}
+                        </td>
+                        <td className="px-6 py-4 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                          {row.echeance}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: row.statut === 'À jour' ? '#E8F5EC' : '#FDEADE',
+                              color: row.statut === 'À jour' ? '#2A6B3E' : '#C4622D',
+                            }}
+                          >
+                            {row.statut}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <button
+                className="mt-6 px-6 py-3 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90 cursor-pointer"
+                style={{ backgroundColor: 'var(--accent)' }}
+              >
+                Payer ma cotisation en ligne →
+              </button>
+            </div>
+          )}
+
+          {activeTab === 'installation' && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+                Conditions d'Installation
+              </h3>
+              {[
+                {
+                  num: '01',
+                  title: 'Diplôme reconnu',
+                  desc: "Être titulaire d'un diplôme de Chirurgien-Dentiste reconnu par le Burkina Faso ou équivalence validée.",
+                },
+                {
+                  num: '02',
+                  title: "Inscription au Tableau de l'Ordre",
+                  desc: "Fournir le dossier complet (diplôme, casier judiciaire, photos, formulaire d'inscription) et s'acquitter de la cotisation.",
+                },
+                {
+                  num: '03',
+                  title: 'Normes du cabinet',
+                  desc: 'Respecter les normes d\'équipement (fauteuil dentaire, stérilisation, rayonnement X) conformément à l\'arrêté ministériel 2025.',
+                },
+                {
+                  num: '04',
+                  title: "Autorisation d'exercice",
+                  desc: "Obtenir l'autorisation du Ministère de la Santé après visite de conformité du cabinet.",
+                },
+              ].map((step) => (
+                <div
+                  key={step.num}
+                  className="flex gap-5 p-5 rounded-xl"
+                  style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+                    style={{ backgroundColor: 'var(--primary)', fontFamily: 'var(--font-heading)' }}
+                  >
+                    {step.num}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-sm mb-1">{step.title}</div>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'juridique' && (
+            <div>
+              <h3 className="text-xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+                Bibliothèque Juridique
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { title: 'Contrat de Collaboration', type: 'DOCX', size: '48 Ko', updated: 'Jan 2025' },
+                  { title: 'Contrat de Remplacement', type: 'DOCX', size: '35 Ko', updated: 'Jan 2025' },
+                  { title: 'Bail Professionnel Type', type: 'PDF', size: '120 Ko', updated: 'Mar 2024' },
+                  { title: 'Modèle Consentement Éclairé Patient', type: 'DOCX', size: '22 Ko', updated: 'Jan 2025' },
+                  { title: 'Convention de Groupement de Cabinets', type: 'PDF', size: '88 Ko', updated: 'Oct 2024' },
+                  { title: 'Charte de Protection des Données (RGPD)', type: 'PDF', size: '65 Ko', updated: 'Juin 2024' },
+                ].map((doc) => (
+                  <div
+                    key={doc.title}
+                    className="flex items-center justify-between p-4 rounded-xl cursor-pointer hover:shadow-sm transition-all"
+                    style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white"
+                        style={{ backgroundColor: doc.type === 'PDF' ? '#C4622D' : '#0C4A5A' }}
+                      >
+                        {doc.type}
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm">{doc.title}</div>
+                        <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                          {doc.size} · Mis à jour {doc.updated}
+                        </div>
+                      </div>
+                    </div>
+                    <button className="text-xs font-semibold cursor-pointer" style={{ color: 'var(--primary)' }}>
+                      ↓
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'attestations' && (
+            <div>
+              <h3 className="text-xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
+                Mes Attestations
+              </h3>
+              <div
+                className="rounded-xl p-8 text-center"
+                style={{ backgroundColor: 'var(--muted)', border: '1px dashed var(--border)' }}
+              >
+                <div className="text-4xl mb-4">🔒</div>
+                <p className="font-semibold mb-2">Connexion requise</p>
+                <p className="text-sm mb-6" style={{ color: 'var(--muted-foreground)' }}>
+                  Connectez-vous à votre espace membre pour accéder à vos attestations personnelles.
+                </p>
+                <button
+                  className="px-6 py-3 rounded-lg text-sm font-semibold text-white cursor-pointer"
+                  style={{ backgroundColor: 'var(--primary)' }}
+                >
+                  Se connecter
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
