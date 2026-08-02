@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import {
+  Home, Landmark, Stethoscope, GraduationCap, Store, BookOpen, Users,
+  BarChart3, MapPin, Newspaper, Lock, Menu, X, ChevronDown,
+} from 'lucide-react'
 
 type Page =
   | 'home'
@@ -18,17 +22,17 @@ interface NavBarProps {
   onNavigate: (page: Page) => void
 }
 
-const navItems: { label: string; page: Page; icon: string }[] = [
-  { label: 'Accueil', page: 'home', icon: '🏠' },
-  { label: 'Institution', page: 'institution', icon: '🏛️' },
-  { label: 'Praticiens', page: 'praticien', icon: '🩺' },
-  { label: 'Formation', page: 'formation', icon: '🎓' },
-  { label: 'Exposition', page: 'exposition', icon: '🏛️' },
-  { label: 'Étudiants', page: 'etudiants', icon: '📚' },
-  { label: 'Patients', page: 'patients', icon: '👥' },
-  { label: 'Annuaire', page: 'annuaire', icon: '📊' },
-  { label: 'Carte', page: 'geolocal', icon: '📍' },
-  { label: 'Actualités', page: 'actualites', icon: '📰' },
+const navItems: { label: string; page: Page; icon: typeof Home }[] = [
+  { label: 'Accueil', page: 'home', icon: Home },
+  { label: 'Institution', page: 'institution', icon: Landmark },
+  { label: 'Praticiens', page: 'praticien', icon: Stethoscope },
+  { label: 'Formation', page: 'formation', icon: GraduationCap },
+  { label: 'Exposition', page: 'exposition', icon: Store },
+  { label: 'Étudiants', page: 'etudiants', icon: BookOpen },
+  { label: 'Patients', page: 'patients', icon: Users },
+  { label: 'Annuaire', page: 'annuaire', icon: BarChart3 },
+  { label: 'Carte', page: 'geolocal', icon: MapPin },
+  { label: 'Actualités', page: 'actualites', icon: Newspaper },
 ]
 
 export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
@@ -62,7 +66,8 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
               onClick={() => onNavigate('compte')}
               className="text-xs text-white bg-white/10 hover:bg-white/20 transition-colors px-3 py-1 rounded-full cursor-pointer"
             >
-              🔒 Espace Membre
+              <Lock size={12} className="inline mr-1 -mt-0.5" />
+              Espace Membre
             </button>
           </div>
         </div>
@@ -71,14 +76,14 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <button
-  onClick={() => onNavigate('home')}
-  className="flex items-center gap-3 cursor-pointer group"
->
-  <img
-    src="/logo-oncdbf.png"
-    alt="Logo ONCD Burkina"
-    className="w-10 h-10 rounded-full shadow-md object-contain bg-white"
-  />
+            onClick={() => onNavigate('home')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <img
+              src="/logo-oncdbf.png"
+              alt="Logo ONCD Burkina"
+              className="w-10 h-10 rounded-full shadow-md object-contain bg-white"
+            />
             <div className="leading-tight">
               <div
                 className="text-white font-semibold text-sm"
@@ -107,9 +112,9 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="text-xs px-3 py-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                className="text-xs px-3 py-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer flex items-center gap-1"
               >
-                Plus ▾
+                Plus <ChevronDown size={14} />
               </button>
               {dropdownOpen && (
                 <div
@@ -122,7 +127,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
                       onClick={() => { onNavigate(item.page); setDropdownOpen(false) }}
                       className="w-full text-left text-xs px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-2"
                     >
-                      <span>{item.icon}</span>
+                      <item.icon size={14} />
                       <span>{item.label}</span>
                     </button>
                   ))}
@@ -135,7 +140,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
             onClick={() => setMenuOpen(!menuOpen)}
             className="lg:hidden text-white/80 hover:text-white p-2 cursor-pointer"
           >
-            {menuOpen ? '✕' : '☰'}
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
@@ -153,7 +158,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
                     : 'text-white/70 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <span>{item.icon}</span>
+                <item.icon size={16} />
                 <span>{item.label}</span>
               </button>
             ))}

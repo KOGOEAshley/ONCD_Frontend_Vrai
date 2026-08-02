@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const parcours = [
   { annee: 'PACES / L1', titre: 'Première Année', desc: "Tronc commun des études de santé. Concours d'accès aux études de chirurgie dentaire." },
@@ -17,32 +17,17 @@ const ressources = [
   { titre: 'Formulaire de validation de stage', type: 'DOCX', taille: '210 Ko' },
 ]
 
-const stages = [
-  {
-    etablissement: 'CHU Yalgado Ouédraogo',
-    ville: 'Ouagadougou',
-    specialite: 'Chirurgie Buccale',
-    places: 4,
-    periode: 'Sep–Déc 2025',
-    niveau: 'D3 / D4',
-  },
-  {
-    etablissement: 'CHU Sanou Souro',
-    ville: 'Bobo-Dioulasso',
-    specialite: 'Orthodontie',
-    places: 2,
-    periode: 'Oct–Jan 2026',
-    niveau: 'D4 / Internat',
-  },
-  {
-    etablissement: 'Centre Médical de Koudougou',
-    ville: 'Koudougou',
-    specialite: 'Omnipratique',
-    places: 3,
-    periode: 'Nov–Fév 2026',
-    niveau: 'D2 / D3',
-  },
-]
+function adapterStage(s: any) {
+  return {
+    id: s.id,
+    etablissement: s.etablissement,
+    ville: s.ville,
+    specialite: s.specialite,
+    places: s.places_restantes,
+    periode: s.periode,
+    niveau: s.niveau_requis,
+  }
+}
 
 export default function EtudiantsPage() {
   const [tab, setTab] = useState('parcours')
@@ -53,9 +38,68 @@ export default function EtudiantsPage() {
     { id: 'vie', label: 'Vie Étudiante' },
   ]
 
+  const [stages, setStages] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/stages/')
+      .then((res) => res.json())
+      .then((data) => setStages(data.map(adapterStage)))
+      .catch((err) => console.error('Erreur API stages :', err))
+  }, [])
+
+  const [candidatureOuverte, setCandidatureOuverte] = useState<number | null>(null)
+  const [candidature, setCandidature] = useState({ nom: '', prenom: '', email: '', telephone: '', niveau_actuel: '', message: '' })
+  const [cvFile, setCvFile] = useState<File | null>(null)
+  const [envoiEnCours, setEnvoiEnCours] = useState(false)
+  const [messageCandidature, setMessageCandidature] = useState('')
+  const [erreurCandidature, setErreurCandidature] = useState('')
+
+  function updateCandidature(champ: string, valeur: string) {
+    setCandidature((prev) => ({ ...prev, [champ]: valeur }))
+  }
+
+  function ouvrirCandidature(stageId: number) {
+    setCandidatureOuverte((prev) => (prev === stageId ? null : stageId))
+    setMessageCandidature('')
+    setErreurCandidature('')
+  }
+
+  async function handlePostulerStage(stageId: number) {
+    setErreurCandidature('')
+    setEnvoiEnCours(true)
+    try {
+      const donnees = new FormData()
+      donnees.append('stage', String(stageId))
+      donnees.append('nom', candidature.nom)
+      donnees.append('prenom', candidature.prenom)
+      donnees.append('email', candidature.email)
+      donnees.append('telephone', candidature.telephone)
+      donnees.append('niveau_actuel', candidature.niveau_actuel)
+      donnees.append('message', candidature.message)
+      if (cvFile) donnees.append('cv', cvFile)
+
+      const res = await fetch('http://127.0.0.1:8000/api/postuler-stage/', {
+        method: 'POST',
+        body: donnees,
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        const premiereErreur = Object.values(data)[0]
+        setErreurCandidature(Array.isArray(premiereErreur) ? String(premiereErreur[0]) : 'Une erreur est survenue.')
+        return
+      }
+      setMessageCandidature(data.message)
+      setCandidature({ nom: '', prenom: '', email: '', telephone: '', niveau_actuel: '', message: '' })
+      setCvFile(null)
+    } catch (err) {
+      setErreurCandidature('Impossible de contacter le serveur.')
+    } finally {
+      setEnvoiEnCours(false)
+    }
+  }
+
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
       <div style={{ backgroundColor: '#2A3E6B' }} className="px-6 py-16">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90A8D4' }}>
@@ -74,7 +118,6 @@ export default function EtudiantsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        {/* Quick links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
             { icon: '📋', label: "M'inscrire à l'Ordre", sub: 'Dès l\'obtention du diplôme' },
@@ -96,7 +139,6 @@ export default function EtudiantsPage() {
           ))}
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-1 p-1 rounded-xl mb-8 flex-wrap" style={{ backgroundColor: 'var(--muted)' }}>
           {tabs.map((t) => (
             <button
@@ -157,36 +199,73 @@ export default function EtudiantsPage() {
             <div className="space-y-4">
               {stages.map((s) => (
                 <div
-                  key={s.etablissement}
-                  className="p-6 rounded-xl flex flex-col md:flex-row md:items-center gap-4"
+                  key={s.id}
+                  className="p-6 rounded-xl"
                   style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
                 >
-                  <div className="flex-1">
-                    <div className="font-semibold text-sm mb-1">{s.etablissement}</div>
-                    <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                      📍 {s.ville} · 🦷 {s.specialite} · 📅 {s.periode}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <div className="text-center">
-                      <div className="font-bold text-lg" style={{ color: 'var(--primary)', fontFamily: 'var(--font-heading)' }}>
-                        {s.places}
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    <div className="flex-1">
+                      <div className="font-semibold text-sm mb-1">{s.etablissement}</div>
+                      <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                        📍 {s.ville} · 🦷 {s.specialite} · 📅 {s.periode}
                       </div>
-                      <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>places</div>
                     </div>
-                    <span
-                      className="text-xs px-2.5 py-1 rounded-full"
-                      style={{ backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)' }}
-                    >
-                      {s.niveau}
-                    </span>
-                    <button
-                      className="px-4 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer hover:opacity-90 transition-all"
-                      style={{ backgroundColor: 'var(--primary)' }}
-                    >
-                      Postuler
-                    </button>
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <div className="text-center">
+                        <div className="font-bold text-lg" style={{ color: 'var(--primary)', fontFamily: 'var(--font-heading)' }}>
+                          {s.places}
+                        </div>
+                        <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>places</div>
+                      </div>
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-full"
+                        style={{ backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)' }}
+                      >
+                        {s.niveau}
+                      </span>
+                      <button
+                        onClick={() => ouvrirCandidature(s.id)}
+                        className="px-4 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer hover:opacity-90 transition-all"
+                        style={{ backgroundColor: 'var(--primary)' }}
+                      >
+                        Postuler
+                      </button>
+                    </div>
                   </div>
+
+                  {candidatureOuverte === s.id && (
+                    <div className="mt-5 pt-5" style={{ borderTop: '1px solid var(--border)' }}>
+                      {messageCandidature ? (
+                        <p className="text-sm p-4 rounded-lg" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
+                          ✅ {messageCandidature}
+                        </p>
+                      ) : (
+                        <>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                            <input placeholder="Prénom" value={candidature.prenom} onChange={(e) => updateCandidature('prenom', e.target.value)} className="px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                            <input placeholder="Nom" value={candidature.nom} onChange={(e) => updateCandidature('nom', e.target.value)} className="px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                            <input type="email" placeholder="Email" value={candidature.email} onChange={(e) => updateCandidature('email', e.target.value)} className="px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                            <input placeholder="Téléphone" value={candidature.telephone} onChange={(e) => updateCandidature('telephone', e.target.value)} className="px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                            <input placeholder="Niveau actuel (ex: D3)" value={candidature.niveau_actuel} onChange={(e) => updateCandidature('niveau_actuel', e.target.value)} className="px-3.5 py-2.5 rounded-lg text-sm outline-none md:col-span-2" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                            <div className="md:col-span-2">
+                              <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>CV (facultatif)</label>
+                              <input type="file" accept=".pdf,.doc,.docx" onChange={(e) => setCvFile(e.target.files?.[0] || null)} className="w-full text-xs px-3.5 py-2.5 rounded-lg outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                            </div>
+                            <textarea placeholder="Message (facultatif)" value={candidature.message} onChange={(e) => updateCandidature('message', e.target.value)} rows={2} className="px-3.5 py-2.5 rounded-lg text-sm outline-none resize-none md:col-span-2" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                          </div>
+                          {erreurCandidature && <p className="text-xs mb-3" style={{ color: '#B33A3A' }}>{erreurCandidature}</p>}
+                          <button
+                            onClick={() => handlePostulerStage(s.id)}
+                            disabled={envoiEnCours}
+                            className="px-5 py-2.5 rounded-lg text-xs font-semibold text-white cursor-pointer hover:opacity-90 transition-all"
+                            style={{ backgroundColor: 'var(--primary)', opacity: envoiEnCours ? 0.6 : 1 }}
+                          >
+                            {envoiEnCours ? 'Envoi...' : 'Envoyer ma candidature'}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

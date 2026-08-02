@@ -1,4 +1,8 @@
 import type { Page } from '../components/NavBar'
+import {
+  Sparkles, Waves, Apple, CalendarDays, BarChart3, MapPin, ArrowRight,
+  ClipboardList, PenLine, Lock,
+} from 'lucide-react'
 
 interface PatientsPageProps {
   onNavigate: (page: Page) => void
@@ -6,28 +10,28 @@ interface PatientsPageProps {
 
 const conseils = [
   {
-    icon: '🦷',
+    icon: Sparkles,
     title: 'Brossage quotidien',
     desc: '2 fois par jour, 2 minutes, avec une brosse à poils souples. Remplacez votre brosse tous les 3 mois.',
     color: '#E8F5EC',
     textColor: '#0C4A5A',
   },
   {
-    icon: '🧵',
+    icon: Waves,
     title: 'Fil dentaire',
     desc: 'Utilisez le fil dentaire au moins une fois par jour pour éliminer la plaque entre les dents inaccessibles à la brosse.',
     color: '#E8EDF5',
     textColor: '#1A3D6B',
   },
   {
-    icon: '🍎',
+    icon: Apple,
     title: 'Alimentation',
     desc: 'Réduisez les sucres raffinés et les boissons acides. Privilégiez les fruits frais, légumes et produits laitiers.',
     color: '#FEF3E8',
     textColor: '#5A2E00',
   },
   {
-    icon: '📅',
+    icon: CalendarDays,
     title: 'Consultation régulière',
     desc: 'Consultez votre dentiste tous les 6 mois, même sans douleur. La prévention est moins coûteuse que le traitement.',
     color: '#FDEADE',
@@ -98,7 +102,7 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
             onClick={() => onNavigate('annuaire')}
             style={{ backgroundColor: 'var(--primary)', color: 'white' }}
           >
-            <div className="text-4xl mb-4">📊</div>
+            <BarChart3 size={36} className="mb-4" strokeWidth={1.75} />
             <h2
               className="text-2xl font-bold mb-3"
               style={{ fontFamily: 'var(--font-heading)' }}
@@ -108,8 +112,8 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
             <p className="text-white/70 text-sm mb-5 leading-relaxed">
               Consultez la liste officielle de tous les chirurgiens-dentistes certifiés du Burkina Faso, filtrée par région et spécialité.
             </p>
-            <span className="text-sm font-semibold group-hover:underline">
-              Rechercher un dentiste →
+            <span className="text-sm font-semibold group-hover:underline flex items-center gap-1">
+              Rechercher un dentiste <ArrowRight size={14} />
             </span>
           </div>
           <div
@@ -117,7 +121,7 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
             onClick={() => onNavigate('geolocal')}
             style={{ backgroundColor: '#2A3E6B', color: 'white' }}
           >
-            <div className="text-4xl mb-4">📍</div>
+            <MapPin size={36} className="mb-4" strokeWidth={1.75} />
             <h2
               className="text-2xl font-bold mb-3"
               style={{ fontFamily: 'var(--font-heading)' }}
@@ -127,8 +131,8 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
             <p className="text-white/70 text-sm mb-5 leading-relaxed">
               Localisez les cabinets dentaires et cliniques les plus proches de votre position sur la carte interactive.
             </p>
-            <span className="text-sm font-semibold group-hover:underline">
-              Voir la carte →
+            <span className="text-sm font-semibold group-hover:underline flex items-center gap-1">
+              Voir la carte <ArrowRight size={14} />
             </span>
           </div>
         </div>
@@ -148,7 +152,7 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
                 className="p-6 rounded-xl"
                 style={{ backgroundColor: c.color }}
               >
-                <div className="text-3xl mb-3">{c.icon}</div>
+                <c.icon size={28} className="mb-3" style={{ color: c.textColor }} strokeWidth={1.75} />
                 <h3
                   className="font-bold text-sm mb-2"
                   style={{ fontFamily: 'var(--font-heading)', color: c.textColor }}
@@ -212,23 +216,23 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
-                icon: '📋',
+                icon: ClipboardList,
                 title: "Droit à l'information",
                 desc: "Vous avez le droit d'être informé clairement sur votre état de santé, les traitements proposés et leurs coûts.",
               },
               {
-                icon: '✍️',
+                icon: PenLine,
                 title: 'Consentement éclairé',
                 desc: 'Aucun acte médical ne peut être réalisé sans votre consentement explicite et informé.',
               },
               {
-                icon: '🔒',
+                icon: Lock,
                 title: 'Confidentialité',
                 desc: 'Vos données médicales sont protégées par le secret professionnel. Elles ne peuvent être partagées sans votre accord.',
               },
             ].map((d) => (
               <div key={d.title}>
-                <div className="text-2xl mb-3">{d.icon}</div>
+                <d.icon size={26} className="mb-3" style={{ color: 'var(--primary)' }} strokeWidth={1.75} />
                 <h3
                   className="font-semibold text-sm mb-2"
                   style={{ fontFamily: 'var(--font-heading)' }}

@@ -1,6 +1,11 @@
+import { useState, useEffect } from 'react'
 import type { Page } from '../components/NavBar'
 import CompteurAnime from '../components/CompteurAnime'
-import { useState, useEffect } from 'react'
+import {
+  Stethoscope, GraduationCap, Users, MapPin, Landmark, Smile,
+  CalendarDays, Store, BarChart3, Newspaper,
+} from 'lucide-react'
+
 
 interface HomePageProps {
   onNavigate: (page: Page) => void
@@ -9,7 +14,7 @@ interface HomePageProps {
 const profileCards = [
   {
     id: 'praticien' as Page,
-    emoji: '🩺',
+    icon: Stethoscope,
     title: 'Je suis Praticien',
     subtitle: 'Chirurgien-Dentiste',
     description: 'Gérez vos démarches administratives, cotisations et accédez aux ressources professionnelles.',
@@ -19,7 +24,7 @@ const profileCards = [
   },
   {
     id: 'etudiants' as Page,
-    emoji: '🎓',
+    icon: GraduationCap,
     title: "Je suis Étudiant",
     subtitle: 'Interne / Futur Dentiste',
     description: 'Parcours universitaire, gestion des stages et préparation à l\'exercice professionnel.',
@@ -29,7 +34,7 @@ const profileCards = [
   },
   {
     id: 'patients' as Page,
-    emoji: '👥',
+    icon: Users,
     title: 'Je suis Patient',
     subtitle: 'Grand Public',
     description: 'Trouvez un dentiste certifié, conseils de prévention et urgences bucco-dentaires.',
@@ -40,10 +45,10 @@ const profileCards = [
 ]
 
 const stats = [
-  { value: '487', label: 'Praticiens inscrits', icon: '👨‍⚕️' },
-  { value: '13', label: 'Régions couvertes', icon: '📍' },
-  { value: '34', label: 'Ans d\'existence', icon: '🏛️' },
-  { value: '1 200+', label: 'Patients par an', icon: '🦷' },
+  { value: '487', label: 'Praticiens inscrits', icon: Stethoscope },
+  { value: '13', label: 'Régions couvertes', icon: MapPin },
+  { value: '34', label: 'Ans d\'existence', icon: Landmark },
+  { value: '1 200+', label: 'Patients par an', icon: Smile },
 ]
 
 function formaterDateCourte(dateIso: string) {
@@ -77,7 +82,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         className="relative overflow-hidden"
         style={{ backgroundColor: 'var(--primary)', minHeight: '540px' }}
       >
-        {/* Background pattern */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -98,7 +102,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           }}
         />
 
-        <div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
           <div>
             <div
               className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full mb-6"
@@ -143,23 +147,37 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-4">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl p-5 backdrop-blur-sm"
-                style={{ backgroundColor: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
-              >
-                <div className="text-2xl mb-2">{stat.icon}</div>
+          <div className="relative rounded-xl overflow-hidden min-h-[420px]">
+          
+            <div
+              className="absolute inset-0 animate-wipe-reveal-left"
+              style={{
+                backgroundImage: "url('/hero-stats-bg.jpg')",
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+            <div className="absolute inset-0" style={{ backgroundColor: 'rgba(12,58,60,0.6)' }} />
+
+            <div className="relative grid grid-cols-2 gap-3 p-4 animate-slide-in-right">
+              <div className="grid grid-cols-2 gap-3 w-full animate-slide-in-right">
+              {stats.map((stat) => (
                 <div
-                  className="text-3xl font-bold text-white mb-1"
-                  style={{ fontFamily: 'var(--font-heading)' }}
+                  key={stat.label}
+                  className="rounded-lg p-3.5 backdrop-blur-sm"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}
                 >
-                  {<CompteurAnime valeur={stat.value} />}
+                  <div
+                    className="text-xl font-bold text-white mb-0.5"
+                    style={{ fontFamily: 'var(--font-heading)' }}
+                  >
+                    {<CompteurAnime valeur={stat.value} />}
+                  </div>
+                  <div className="text-xs text-white/60 leading-tight">{stat.label}</div>
                 </div>
-                <div className="text-xs text-white/50 leading-tight">{stat.label}</div>
+              ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
@@ -174,7 +192,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               className="text-left rounded-2xl p-6 cursor-pointer group transition-all hover:-translate-y-1 hover:shadow-2xl"
               style={{ backgroundColor: card.bg, border: `1px solid ${card.accent}30` }}
             >
-              <div className="text-3xl mb-4">{card.emoji}</div>
+              <card.icon className="w-8 h-8 mb-4 text-white" strokeWidth={1.75} />
               <div className="text-lg font-bold text-white mb-0.5" style={{ fontFamily: 'var(--font-heading)' }}>
                 {card.title}
               </div>
@@ -196,11 +214,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <section className="max-w-7xl mx-auto px-6 mb-20">
         <div className="flex flex-wrap gap-3 justify-center">
           {[
-            { label: '📅 Événements & Congrès', page: 'formation' as Page },
-            { label: '🏛️ Exposition Dentaire', page: 'exposition' as Page },
-            { label: '📊 Annuaire des Dentistes', page: 'annuaire' as Page },
-            { label: '📍 Localiser une Clinique', page: 'geolocal' as Page },
-            { label: '📰 Actualités Médicales', page: 'actualites' as Page },
+            { label: 'Événements & Congrès', page: 'formation' as Page, icon: CalendarDays },
+            { label: 'Exposition Dentaire', page: 'exposition' as Page, icon: Store },
+            { label: 'Annuaire des Dentistes', page: 'annuaire' as Page, icon: BarChart3 },
+            { label: 'Localiser une Clinique', page: 'geolocal' as Page, icon: MapPin },
+            { label: 'Actualités Médicales', page: 'actualites' as Page, icon: Newspaper },
           ].map((item) => (
             <button
               key={item.page}
@@ -212,6 +230,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 border: '1px solid var(--border)',
               }}
             >
+              <item.icon size={16} />
               {item.label}
             </button>
           ))}

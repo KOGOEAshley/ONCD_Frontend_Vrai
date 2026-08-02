@@ -1,61 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
-const exposants = [
-  {
-    id: 1,
-    nom: 'DentaCare Africa',
-    pays: 'Côte d\'Ivoire',
-    categorie: 'Équipements',
-    produits: ['Fauteuils dentaires', 'Unités de soins', 'Turbines'],
-    stand: 'A-12',
-    contact: 'info@dentacareafrica.com',
-  },
-  {
-    id: 2,
-    nom: 'PharmaDent BF',
-    pays: 'Burkina Faso',
-    categorie: 'Pharmacie',
-    produits: ['Anesthésiques', 'Matériaux d\'obturation', 'Antiseptiques'],
-    stand: 'B-03',
-    contact: 'contact@pharmadent.bf',
-  },
-  {
-    id: 3,
-    nom: 'Siemens Healthineers',
-    pays: 'Allemagne',
-    categorie: 'Imagerie',
-    produits: ['Radiologie numérique', 'Cone Beam CT', 'Logiciels d\'imagerie'],
-    stand: 'C-01',
-    contact: 'dental@siemens.com',
-  },
-  {
-    id: 4,
-    nom: 'ProLabo BF',
-    pays: 'Burkina Faso',
-    categorie: 'Prothèse',
-    produits: ['Couronnes céramique', 'Bridges', 'Prothèses amovibles'],
-    stand: 'B-15',
-    contact: 'prolabo@gmail.com',
-  },
-  {
-    id: 5,
-    nom: 'ImplantPro West Africa',
-    pays: 'Sénégal',
-    categorie: 'Implants',
-    produits: ['Implants titanium', 'Piliers prothétiques', 'Membranes régénératives'],
-    stand: 'A-06',
-    contact: 'contact@implantpro-wa.sn',
-  },
-  {
-    id: 6,
-    nom: 'Dentsply Sirona',
-    pays: 'États-Unis',
-    categorie: 'Instrumentation',
-    produits: ['Instruments rotatifs', 'Fouloirs', 'Matériaux composites'],
-    stand: 'C-08',
-    contact: 'africa@dentsply.com',
-  },
-]
+const API_BASE = 'http://127.0.0.1:8000'
+
+function urlFichier(chemin: string | null | undefined) {
+  if (!chemin) return null
+  return chemin.startsWith('http') ? chemin : `${API_BASE}${chemin}`
+}
+
+function adapterExposant(e: any) {
+  return {
+    id: e.id,
+    nom: e.nom,
+    pays: e.pays,
+    categorie: e.categorie,
+    produits: (e.produits || '').split(',').map((p: string) => p.trim()).filter(Boolean),
+    stand: e.stand,
+    contact: e.contact_email,
+    logoUrl: urlFichier(e.logo),
+    photoStandUrl: urlFichier(e.photo_stand),
+  }
+}
 
 const categories = ['Tous', 'Équipements', 'Pharmacie', 'Imagerie', 'Prothèse', 'Implants', 'Instrumentation']
 
@@ -69,12 +33,57 @@ const catColor: Record<string, { bg: string; text: string }> = {
 }
 
 export default function ExpositionPage() {
+  const [exposants, setExposants] = useState<any[]>([])
   const [catFilter, setCatFilter] = useState('Tous')
+  const catalogueRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/exposants/`)
+      .then((res) => res.json())
+      .then((data) => setExposants(data.map(adapterExposant)))
+      .catch((err) => console.error('Erreur API exposants :', err))
+  }, [])
+
   const filtered = catFilter === 'Tous' ? exposants : exposants.filter((e) => e.categorie === catFilter)
+
+  const [formulaireOuvert, setFormulaireOuvert] = useState(false)
+  const [reservation, setReservation] = useState({
+    nom_entreprise: '', email: '', telephone: '', pays: '', categorie_souhaitee: categories[1], message: '',
+  })
+  const [envoiEnCours, setEnvoiEnCours] = useState(false)
+  const [messageReservation, setMessageReservation] = useState('')
+  const [erreurReservation, setErreurReservation] = useState('')
+
+  function updateReservation(champ: string, valeur: string) {
+    setReservation((prev) => ({ ...prev, [champ]: valeur }))
+  }
+
+  async function handleReserverStand() {
+    setErreurReservation('')
+    setEnvoiEnCours(true)
+    try {
+      const res = await fetch(`${API_BASE}/api/reserver-stand/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reservation),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        const premiereErreur = Object.values(data)[0]
+        setErreurReservation(Array.isArray(premiereErreur) ? String(premiereErreur[0]) : 'Une erreur est survenue.')
+        return
+      }
+      setMessageReservation(data.message)
+      setReservation({ nom_entreprise: '', email: '', telephone: '', pays: '', categorie_souhaitee: categories[1], message: '' })
+    } catch (err) {
+      setErreurReservation('Impossible de contacter le serveur.')
+    } finally {
+      setEnvoiEnCours(false)
+    }
+  }
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
       <div
         style={{ background: 'linear-gradient(135deg, #2A1A0E 0%, #5C2A0E 100%)' }}
         className="px-6 py-16"
@@ -116,7 +125,6 @@ export default function ExpositionPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Become an exhibitor CTA */}
         <div
           className="rounded-2xl p-8 mb-12 flex flex-col md:flex-row items-center justify-between gap-6"
           style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }}
@@ -131,12 +139,14 @@ export default function ExpositionPage() {
           </div>
           <div className="flex gap-3 flex-shrink-0">
             <button
+              onClick={() => { setFormulaireOuvert((v) => !v); setMessageReservation('') }}
               className="px-6 py-3 rounded-lg text-sm font-semibold text-white cursor-pointer hover:opacity-90 transition-all"
               style={{ backgroundColor: 'var(--accent)' }}
             >
               Réserver un stand →
             </button>
             <button
+              onClick={() => catalogueRef.current?.scrollIntoView({ behavior: 'smooth' })}
               className="px-6 py-3 rounded-lg text-sm font-semibold cursor-pointer transition-all"
               style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
             >
@@ -145,8 +155,61 @@ export default function ExpositionPage() {
           </div>
         </div>
 
-        {/* Filter */}
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+        {formulaireOuvert && (
+          <div className="rounded-2xl p-8 mb-12" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
+            <h3 className="text-lg font-bold mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Demande de réservation de stand</h3>
+
+            {messageReservation ? (
+              <p className="text-sm p-4 rounded-lg" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
+                ✅ {messageReservation}
+              </p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Nom de l'entreprise</label>
+                    <input value={reservation.nom_entreprise} onChange={(e) => updateReservation('nom_entreprise', e.target.value)} className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Pays</label>
+                    <input value={reservation.pays} onChange={(e) => updateReservation('pays', e.target.value)} className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Email</label>
+                    <input type="email" value={reservation.email} onChange={(e) => updateReservation('email', e.target.value)} className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Téléphone</label>
+                    <input value={reservation.telephone} onChange={(e) => updateReservation('telephone', e.target.value)} className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Catégorie souhaitée</label>
+                    <select value={reservation.categorie_souhaitee} onChange={(e) => updateReservation('categorie_souhaitee', e.target.value)} className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }}>
+                      {categories.slice(1).map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Message (produits, besoins spécifiques...)</label>
+                    <textarea value={reservation.message} onChange={(e) => updateReservation('message', e.target.value)} rows={3} className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none resize-none" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }} />
+                  </div>
+                </div>
+
+                {erreurReservation && <p className="text-xs mb-3" style={{ color: '#B33A3A' }}>{erreurReservation}</p>}
+
+                <button
+                  onClick={handleReserverStand}
+                  disabled={envoiEnCours}
+                  className="px-6 py-3 rounded-lg text-sm font-semibold text-white cursor-pointer hover:opacity-90 transition-all"
+                  style={{ backgroundColor: 'var(--accent)', opacity: envoiEnCours ? 0.6 : 1 }}
+                >
+                  {envoiEnCours ? 'Envoi...' : 'Envoyer la demande'}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        <div ref={catalogueRef} className="flex items-center justify-between mb-6 flex-wrap gap-4">
           <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
             Exposants 2025
           </h2>
@@ -167,50 +230,78 @@ export default function ExpositionPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filtered.map((e) => (
             <div
               key={e.id}
-              className="p-6 rounded-xl hover:-translate-y-0.5 hover:shadow-lg transition-all cursor-pointer group"
+              className="rounded-xl overflow-hidden hover:-translate-y-0.5 hover:shadow-lg transition-all cursor-pointer group flex flex-col sm:flex-row"
               style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-                  style={{ backgroundColor: 'var(--primary)' }}
-                >
-                  {e.stand}
-                </div>
-                <span
-                  className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                  style={{
-                    backgroundColor: catColor[e.categorie]?.bg ?? '#F5F5F5',
-                    color: catColor[e.categorie]?.text ?? '#333',
-                  }}
-                >
-                  {e.categorie}
-                </span>
-              </div>
-              <h3
-                className="font-bold text-sm mb-1"
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
-                {e.nom}
-              </h3>
-              <p className="text-xs mb-3" style={{ color: 'var(--muted-foreground)' }}>
-                🌍 {e.pays}
-              </p>
-              <div className="space-y-1 mb-4">
-                {e.produits.map((p) => (
-                  <div key={p} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                    <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--secondary)' }} />
-                    {p}
+              <div className={`p-6 ${e.photoStandUrl ? 'sm:w-3/5' : 'w-full'}`}>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    {e.logoUrl ? (
+                      <img
+                        src={e.logoUrl}
+                        alt={`Logo ${e.nom}`}
+                        className="w-10 h-10 rounded-lg object-contain bg-white border"
+                        style={{ borderColor: 'var(--border)' }}
+                      />
+                    ) : (
+                      <div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                        style={{ backgroundColor: 'var(--primary)' }}
+                      >
+                        {e.stand}
+                      </div>
+                    )}
                   </div>
-                ))}
+                  <span
+                    className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: catColor[e.categorie]?.bg ?? '#F5F5F5',
+                      color: catColor[e.categorie]?.text ?? '#333',
+                    }}
+                  >
+                    {e.categorie}
+                  </span>
+                </div>
+                {e.logoUrl && (
+                  <div
+                    className="inline-block text-xs font-semibold px-2 py-0.5 rounded mb-2"
+                    style={{ backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)' }}
+                  >
+                    Stand {e.stand}
+                  </div>
+                )}
+                <h3
+                  className="font-bold text-sm mb-1"
+                  style={{ fontFamily: 'var(--font-heading)' }}
+                >
+                  {e.nom}
+                </h3>
+                <p className="text-xs mb-3" style={{ color: 'var(--muted-foreground)' }}>
+                  🌍 {e.pays}
+                </p>
+                <div className="space-y-1 mb-4">
+                  {e.produits.map((p: string) => (
+                    <div key={p} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                      <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--secondary)' }} />
+                      {p}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                  ✉️ {e.contact}
+                </div>
               </div>
-              <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                ✉️ {e.contact}
-              </div>
+              {e.photoStandUrl && (
+                <img
+                  src={e.photoStandUrl}
+                  alt={`Stand ${e.nom}`}
+                  className="w-full h-48 sm:w-2/5 sm:h-auto object-cover flex-shrink-0"
+                />
+              )}
             </div>
           ))}
         </div>

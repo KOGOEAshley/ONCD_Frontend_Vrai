@@ -28,7 +28,7 @@ export default function App() {
       case 'institution':
         return <InstitutionPage />
       case 'praticien':
-        return <PraticienPage />
+        return <PraticienPage onNavigate={handleNavigate} />
       case 'formation':
         return <FormationPage />
       case 'exposition':

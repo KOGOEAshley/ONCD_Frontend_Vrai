@@ -1,4 +1,5 @@
 import type { Page } from './NavBar'
+import { MapPin, Phone, Mail, ArrowRight } from 'lucide-react'
 
 interface FooterProps {
   onNavigate: (page: Page) => void
@@ -9,15 +10,13 @@ export default function Footer({ onNavigate }: FooterProps) {
     <footer style={{ backgroundColor: '#071E26', color: 'rgba(255,255,255,0.75)', fontFamily: 'var(--font-body)' }}>
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold"
-                style={{ backgroundColor: 'var(--accent)' }}
-              >
-                ✦
-              </div>
+              <img
+                src="/logo-oncdbf.png"
+                alt="Logo ONCD Burkina"
+                className="w-10 h-10 rounded-full bg-white"
+              />
               <div>
                 <div className="text-white font-semibold text-sm" style={{ fontFamily: 'var(--font-heading)' }}>
                   ONCD Burkina
@@ -30,7 +29,6 @@ export default function Footer({ onNavigate }: FooterProps) {
             </p>
           </div>
 
-          {/* Links */}
           <div>
             <h4 className="text-white text-sm font-semibold mb-4 uppercase tracking-widest text-xs">
               Institution
@@ -82,16 +80,16 @@ export default function Footer({ onNavigate }: FooterProps) {
               Contact
             </h4>
             <ul className="space-y-2 text-sm text-white/60">
-              <li>📍 Ouagadougou, Burkina Faso</li>
-              <li>📞 +226 25 30 XX XX</li>
-              <li>✉️ contact@oncd-bf.org</li>
+              <li className="flex items-center gap-2"><MapPin size={14} /> Ouagadougou, Burkina Faso</li>
+              <li className="flex items-center gap-2"><Phone size={14} /> +226 25 30 XX XX</li>
+              <li className="flex items-center gap-2"><Mail size={14} /> contact@oncd-bf.org</li>
               <li className="pt-2">
                 <button
                   onClick={() => onNavigate('compte')}
-                  className="text-xs px-4 py-2 rounded-full text-white cursor-pointer transition-colors"
+                  className="text-xs px-4 py-2 rounded-full text-white cursor-pointer transition-colors flex items-center gap-1.5"
                   style={{ backgroundColor: 'var(--accent)' }}
                 >
-                  Espace Membre →
+                  Espace Membre <ArrowRight size={14} />
                 </button>
               </li>
             </ul>
