@@ -1,4 +1,6 @@
 import type { Page } from '../components/NavBar'
+import CompteurAnime from '../components/CompteurAnime'
+import { useState, useEffect } from 'react'
 
 interface HomePageProps {
   onNavigate: (page: Page) => void
@@ -44,28 +46,30 @@ const stats = [
   { value: '1 200+', label: 'Patients par an', icon: '🦷' },
 ]
 
-const news = [
-  {
-    date: '22 Jul 2025',
-    category: 'Formation',
-    title: 'Congrès National de Chirurgie Dentaire — Ouagadougou 2025',
-    excerpt: 'Le 18e congrès annuel de l\'ONCD se tiendra du 14 au 16 novembre 2025 à Ouagadougou. Inscriptions ouvertes.',
-  },
-  {
-    date: '15 Jul 2025',
-    category: 'Réglementation',
-    title: 'Nouveau décret sur l\'installation des cabinets dentaires',
-    excerpt: 'Le Ministère de la Santé a publié un arrêté actualisant les normes d\'équipement obligatoires pour 2025.',
-  },
-  {
-    date: '8 Jul 2025',
-    category: 'Alerte sanitaire',
-    title: 'Campagne nationale de dépistage bucco-dentaire scolaire',
-    excerpt: 'L\'ONCD lance une campagne de sensibilisation dans les écoles primaires des 13 régions du Burkina.',
-  },
-]
+function formaterDateCourte(dateIso: string) {
+  const d = new Date(dateIso)
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+function adapterNews(a: any) {
+  return {
+    date: formaterDateCourte(a.date_publication),
+    category: a.categorie,
+    title: a.titre,
+    excerpt: a.extrait,
+  }
+}
 
 export default function HomePage({ onNavigate }: HomePageProps) {
+  const [news, setNews] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/actualites/')
+      .then((res) => res.json())
+      .then((data) => setNews(data.slice(0, 3).map(adapterNews)))
+      .catch((err) => console.error('Erreur API actualités :', err))
+  }, [])
+
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
       {/* Hero */}
@@ -151,7 +155,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   className="text-3xl font-bold text-white mb-1"
                   style={{ fontFamily: 'var(--font-heading)' }}
                 >
-                  {stat.value}
+                  {<CompteurAnime valeur={stat.value} />}
                 </div>
                 <div className="text-xs text-white/50 leading-tight">{stat.label}</div>
               </div>

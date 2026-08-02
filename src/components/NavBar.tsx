@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 type Page =
   | 'home'
@@ -34,13 +34,23 @@ const navItems: { label: string; page: Page; icon: string }[] = [
 export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <nav
       style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--primary)' }}
       className="sticky top-0 z-50 shadow-lg"
     >
-      {/* Top bar */}
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
           <p className="text-white/60 text-xs">
@@ -58,20 +68,17 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
         </div>
       </div>
 
-      {/* Main nav */}
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <button
-            onClick={() => onNavigate('home')}
-            className="flex items-center gap-3 cursor-pointer group"
-          >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-md"
-              style={{ backgroundColor: 'var(--accent)', color: 'white' }}
-            >
-              ✦
-            </div>
+  onClick={() => onNavigate('home')}
+  className="flex items-center gap-3 cursor-pointer group"
+>
+  <img
+    src="/logo-oncdbf.png"
+    alt="Logo ONCD Burkina"
+    className="w-10 h-10 rounded-full shadow-md object-contain bg-white"
+  />
             <div className="leading-tight">
               <div
                 className="text-white font-semibold text-sm"
@@ -83,7 +90,6 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
             </div>
           </button>
 
-          {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-1">
             {navItems.slice(0, 7).map((item) => (
               <button
@@ -98,18 +104,15 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
                 {item.label}
               </button>
             ))}
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <button
-                onMouseEnter={() => setDropdownOpen(true)}
-                onMouseLeave={() => setDropdownOpen(false)}
+                onClick={() => setDropdownOpen((prev) => !prev)}
                 className="text-xs px-3 py-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
               >
                 Plus ▾
               </button>
               {dropdownOpen && (
                 <div
-                  onMouseEnter={() => setDropdownOpen(true)}
-                  onMouseLeave={() => setDropdownOpen(false)}
                   className="absolute right-0 top-full mt-1 w-48 rounded-lg shadow-xl py-1 z-50"
                   style={{ backgroundColor: 'var(--primary)', border: '1px solid rgba(255,255,255,0.15)' }}
                 >
@@ -128,7 +131,6 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
             </div>
           </div>
 
-          {/* Mobile toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="lg:hidden text-white/80 hover:text-white p-2 cursor-pointer"
@@ -138,7 +140,6 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && (
         <div className="lg:hidden border-t border-white/10 max-w-7xl mx-auto px-4 pb-4">
           <div className="grid grid-cols-2 gap-1 pt-3">

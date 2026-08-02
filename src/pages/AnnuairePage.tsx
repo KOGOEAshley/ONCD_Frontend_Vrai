@@ -16,8 +16,13 @@ const regions = [
   { name: 'Plateau Central', count: 2, pct: 0 },
 ]
 
-// Traduit les champs de l'API Django (nom, prenom, telephone, date_inscription...)
-// vers le format attendu par ce composant (name, phone, inscrit...)
+const SECTEUR_LABELS: Record<string, string> = {
+  liberal: 'Libéral',
+  secteur_public: 'Public',
+  secteur_prive: 'Privé',
+  mixte: 'Mixte',
+}
+
 function adapterPraticien(p: any) {
   return {
     id: p.id,
@@ -27,7 +32,8 @@ function adapterPraticien(p: any) {
     ville: p.ville,
     cabinet: p.numero_inscription,
     phone: p.telephone,
-    statut: p.statut === 'actif' ? 'Secteur libéral' : p.statut,
+    secteur: p.secteur,
+    secteurLabel: SECTEUR_LABELS[p.secteur] || p.secteur,
     inscrit: p.date_inscription ? new Date(p.date_inscription).getFullYear() : null,
   }
 }
@@ -50,13 +56,12 @@ export default function AnnuairePage() {
     const matchSearch =
       !q || d.name.toLowerCase().includes(q) || d.ville.toLowerCase().includes(q) || d.specialite.toLowerCase().includes(q)
     const matchRegion = regionFilter === 'Toutes' || d.region === regionFilter
-    const matchSecteur = secteurFilter === 'Tous' || d.statut === secteurFilter
+    const matchSecteur = secteurFilter === 'Tous' || d.secteur === secteurFilter
     return matchSearch && matchRegion && matchSecteur
   })
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
       <div style={{ backgroundColor: '#1C2B3A' }} className="px-6 py-16">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#7BAFD4' }}>
@@ -75,7 +80,6 @@ export default function AnnuairePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-10">
-        {/* Stats row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
             { label: 'Praticiens inscrits', value: '487', sub: 'au 01/07/2025' },
@@ -103,7 +107,6 @@ export default function AnnuairePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left: regional chart */}
           <div>
             <h2 className="text-lg font-bold mb-5" style={{ fontFamily: 'var(--font-heading)' }}>
               Répartition par Région
@@ -134,9 +137,7 @@ export default function AnnuairePage() {
             </div>
           </div>
 
-          {/* Right: directory */}
           <div className="lg:col-span-2">
-            {/* Search & filters */}
             <div className="flex flex-wrap gap-3 mb-6">
               <input
                 type="text"
@@ -178,8 +179,10 @@ export default function AnnuairePage() {
                 }}
               >
                 <option value="Tous">Tous secteurs</option>
-                <option value="Secteur libéral">Libéral</option>
-                <option value="Secteur public">Public</option>
+                <option value="liberal">Libéral</option>
+                <option value="secteur_public">Public</option>
+                <option value="secteur_prive">Privé</option>
+                <option value="mixte">Mixte</option>
               </select>
             </div>
 
@@ -212,11 +215,11 @@ export default function AnnuairePage() {
                         <span
                           className="text-xs px-2 py-0.5 rounded-full flex-shrink-0"
                           style={{
-                            backgroundColor: d.statut === 'Secteur libéral' ? '#E8F5EC' : '#E8EDF5',
-                            color: d.statut === 'Secteur libéral' ? '#2A6B3E' : '#2A3E6B',
+                            backgroundColor: d.secteur === 'liberal' ? '#E8F5EC' : '#E8EDF5',
+                            color: d.secteur === 'liberal' ? '#2A6B3E' : '#2A3E6B',
                           }}
                         >
-                          {d.statut === 'Secteur libéral' ? 'Libéral' : 'Public'}
+                          {d.secteurLabel}
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">

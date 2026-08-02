@@ -1,62 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-const events = [
-  {
-    id: 1,
-    type: 'Congrès',
-    title: '18e Congrès National de Chirurgie Dentaire',
-    date: '14–16 Nov 2025',
-    location: 'Ouagadougou, Palais des Congrès',
-    spots: 42,
-    totalSpots: 300,
-    price: '85 000 FCFA',
-    tags: ['Implantologie', 'Endodontie', 'Parodontologie'],
-    featured: true,
-  },
-  {
-    id: 2,
-    type: 'Atelier',
-    title: 'Techniques d\'Anesthésie Loco-Régionale',
-    date: '8 Sep 2025',
-    location: 'Bobo-Dioulasso, CHU SS',
-    spots: 3,
-    totalSpots: 20,
-    price: '45 000 FCFA',
-    tags: ['Anesthésie', 'Pratique'],
-    featured: false,
-  },
-  {
-    id: 3,
-    type: 'Webinaire',
-    title: 'Radiologie Numérique & Cone Beam en Cabinet',
-    date: '25 Août 2025',
-    location: 'En ligne',
-    spots: 120,
-    totalSpots: 200,
-    price: '15 000 FCFA',
-    tags: ['Radiologie', 'Digital'],
-    featured: false,
-  },
-  {
-    id: 4,
-    type: 'DPC',
-    title: 'Gestion du Risque Infectieux en Odontologie',
-    date: '12 Oct 2025',
-    location: 'Ouagadougou, Siège ONCD',
-    spots: 8,
-    totalSpots: 30,
-    price: 'Gratuit (membres)',
-    tags: ['Hygiène', 'Réglementation'],
-    featured: false,
-  },
-]
+const MOIS_COURTS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
 
-const elearning = [
-  { title: 'Introduction à l\'Implantologie', duration: '4h30', level: 'Intermédiaire', enrolled: 124 },
-  { title: 'Orthodontie Adulte: Protocoles Actuels', duration: '3h15', level: 'Avancé', enrolled: 89 },
-  { title: 'Gestion du Patient Anxieux', duration: '2h00', level: 'Débutant', enrolled: 203 },
-  { title: 'Déontologie & Éthique Professionnelle', duration: '1h30', level: 'Obligatoire', enrolled: 487 },
-]
+function formaterPlageDates(dateDebut: string, dateFin: string | null) {
+  const d1 = new Date(dateDebut)
+  if (!dateFin || dateFin === dateDebut) {
+    return `${d1.getDate()} ${MOIS_COURTS[d1.getMonth()]} ${d1.getFullYear()}`
+  }
+  const d2 = new Date(dateFin)
+  if (d1.getMonth() === d2.getMonth() && d1.getFullYear() === d2.getFullYear()) {
+    return `${d1.getDate()}–${d2.getDate()} ${MOIS_COURTS[d1.getMonth()]} ${d1.getFullYear()}`
+  }
+  return `${d1.getDate()} ${MOIS_COURTS[d1.getMonth()]} – ${d2.getDate()} ${MOIS_COURTS[d2.getMonth()]} ${d2.getFullYear()}`
+}
+
+function adapterEvenement(e: any) {
+  return {
+    id: e.id,
+    type: e.categorie,
+    title: e.titre,
+    date: formaterPlageDates(e.date_debut, e.date_fin),
+    location: e.lieu,
+    spots: e.places_restantes,
+    totalSpots: e.places_totales,
+    price: e.prix,
+    tags: (e.tags || '').split(',').map((t: string) => t.trim()).filter(Boolean),
+    featured: e.featured,
+  }
+}
+
+function adapterModule(m: any) {
+  return {
+    id: m.id,
+    title: m.titre,
+    duration: m.duree,
+    level: m.niveau,
+    enrolled: m.nombre_inscrits,
+  }
+}
 
 const typeColor: Record<string, { bg: string; text: string }> = {
   'Congrès': { bg: '#E8EDF5', text: '#2A3E6B' },
@@ -66,13 +47,55 @@ const typeColor: Record<string, { bg: string; text: string }> = {
 }
 
 export default function FormationPage() {
+  const [events, setEvents] = useState<any[]>([])
   const [filter, setFilter] = useState<string>('Tous')
   const types = ['Tous', 'Congrès', 'Atelier', 'Webinaire', 'DPC']
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/evenements/')
+      .then((res) => res.json())
+      .then((data) => setEvents(data.map(adapterEvenement)))
+      .catch((err) => console.error('Erreur API événements :', err))
+  }, [])
   const filtered = filter === 'Tous' ? events : events.filter((e) => e.type === filter)
+
+  const [elearning, setElearning] = useState<any[]>([])
+  const [messageModule, setMessageModule] = useState<Record<number, string>>({})
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/modules-elearning/')
+      .then((res) => res.json())
+      .then((data) => setElearning(data.map(adapterModule)))
+      .catch((err) => console.error('Erreur API modules e-learning :', err))
+  }, [])
+
+  async function handleInscrireModule(moduleId: number) {
+    const token = localStorage.getItem('oncdbf_token')
+    if (!token) {
+      setMessageModule((prev) => ({ ...prev, [moduleId]: 'Connectez-vous à votre espace membre pour vous inscrire.' }))
+      return
+    }
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/modules-elearning/${moduleId}/inscrire/`, {
+        method: 'POST',
+        headers: { Authorization: `Token ${token}` },
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setMessageModule((prev) => ({ ...prev, [moduleId]: data.detail || "Erreur lors de l'inscription." }))
+        return
+      }
+      setMessageModule((prev) => ({ ...prev, [moduleId]: data.message }))
+      setElearning((prev) =>
+        prev.map((m) => (m.id === moduleId ? { ...m, enrolled: m.enrolled + 1 } : m))
+      )
+    } catch (err) {
+      setMessageModule((prev) => ({ ...prev, [moduleId]: 'Impossible de contacter le serveur.' }))
+    }
+  }
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
       <div style={{ backgroundColor: '#2A3E6B' }} className="px-6 py-16">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90A8D4' }}>
@@ -91,7 +114,6 @@ export default function FormationPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Featured event */}
         {events
           .filter((e) => e.featured)
           .map((event) => (
@@ -119,7 +141,7 @@ export default function FormationPage() {
                   </h2>
                   <p className="text-white/65 text-sm mb-4">📍 {event.location}</p>
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {event.tags.map((tag) => (
+                    {event.tags.map((tag: string) => (
                       <span
                         key={tag}
                         className="text-xs px-2.5 py-1 rounded-full"
@@ -155,7 +177,6 @@ export default function FormationPage() {
                   </button>
                 </div>
               </div>
-              {/* Progress bar */}
               <div className="mx-8 md:mx-10 mb-8">
                 <div className="flex justify-between text-xs text-white/50 mb-1.5">
                   <span>Taux de remplissage</span>
@@ -174,7 +195,6 @@ export default function FormationPage() {
             </div>
           ))}
 
-        {/* Event filters */}
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
           <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
             Prochains Événements
@@ -231,7 +251,7 @@ export default function FormationPage() {
                   📍 {event.location}
                 </p>
                 <div className="flex flex-wrap gap-1 mb-4">
-                  {event.tags.map((tag) => (
+                  {event.tags.map((tag: string) => (
                     <span
                       key={tag}
                       className="text-xs px-2 py-0.5 rounded"
@@ -257,7 +277,6 @@ export default function FormationPage() {
           ))}
         </div>
 
-        {/* E-learning */}
         <div>
           <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
             E-Learning — Modules en ligne
@@ -265,38 +284,52 @@ export default function FormationPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {elearning.map((m) => (
               <div
-                key={m.title}
-                className="flex items-center gap-4 p-5 rounded-xl hover:shadow-sm transition-all cursor-pointer"
+                key={m.id}
+                className="p-5 rounded-xl hover:shadow-sm transition-all"
                 style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
               >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                  style={{ backgroundColor: 'var(--muted)' }}
-                >
-                  🎬
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-sm truncate">{m.title}</div>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                      ⏱ {m.duration}
-                    </span>
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full"
-                      style={{
-                        backgroundColor: m.level === 'Obligatoire' ? '#FDEADE' : 'var(--muted)',
-                        color: m.level === 'Obligatoire' ? '#C4622D' : 'var(--muted-foreground)',
-                      }}
-                    >
-                      {m.level}
-                    </span>
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                    style={{ backgroundColor: 'var(--muted)' }}
+                  >
+                    🎬
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm truncate">{m.title}</div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                        ⏱ {m.duration}
+                      </span>
+                      <span
+                        className="text-xs px-2 py-0.5 rounded-full"
+                        style={{
+                          backgroundColor: m.level === 'Obligatoire' ? '#FDEADE' : 'var(--muted)',
+                          color: m.level === 'Obligatoire' ? '#C4622D' : 'var(--muted-foreground)',
+                        }}
+                      >
+                        {m.level}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-xs font-bold" style={{ color: 'var(--primary)' }}>
+                      {m.enrolled}
+                    </div>
+                    <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>inscrits</div>
                   </div>
                 </div>
-                <div className="text-right flex-shrink-0">
-                  <div className="text-xs font-bold" style={{ color: 'var(--primary)' }}>
-                    {m.enrolled}
-                  </div>
-                  <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>inscrits</div>
+                <div className="flex items-center justify-between mt-4 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
+                  <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                    {messageModule[m.id] || ''}
+                  </span>
+                  <button
+                    onClick={() => handleInscrireModule(m.id)}
+                    className="text-xs font-semibold cursor-pointer px-4 py-1.5 rounded-full text-white flex-shrink-0"
+                    style={{ backgroundColor: 'var(--primary)' }}
+                  >
+                    S'inscrire
+                  </button>
                 </div>
               </div>
             ))}

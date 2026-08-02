@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
@@ -6,6 +6,13 @@ const REGIONS = [
   'Centre', 'Hauts-Bassins', 'Centre-Ouest', 'Centre-Nord', 'Sahel', 'Est',
   'Boucle du Mouhoun', 'Sud-Ouest', 'Centre-Sud', 'Nord', 'Centre-Est',
   'Cascades', 'Plateau Central',
+]
+
+const SECTEURS = [
+  { valeur: 'liberal', label: 'Chirurgien-Dentiste libéral' },
+  { valeur: 'secteur_public', label: 'Salarié secteur public' },
+  { valeur: 'secteur_prive', label: 'Salarié secteur privé' },
+  { valeur: 'mixte', label: 'Exercice mixte' },
 ]
 
 const inputStyle = {
@@ -38,6 +45,7 @@ export default function ComptePage() {
     ville: '',
     region: REGIONS[0],
     specialite: '',
+    secteur: SECTEURS[0].valeur,
     username: '',
     passwordInscription: '',
     passwordConfirm: '',
@@ -51,6 +59,19 @@ export default function ComptePage() {
   const [attestationChargement, setAttestationChargement] = useState(false)
   const [attestationErreur, setAttestationErreur] = useState('')
 
+  const [formations, setFormations] = useState<any[]>([])
+  const [formationEnCours, setFormationEnCours] = useState<number | null>(null)
+  const [formationsErreur, setFormationsErreur] = useState('')
+
+  const [modules, setModules] = useState<any[]>([])
+  const [modulesErreur, setModulesErreur] = useState('')
+  const [moduleEnCours, setModuleEnCours] = useState<number | null>(null)
+
+  const [modeEdition, setModeEdition] = useState(false)
+  const [editForm, setEditForm] = useState({ telephone: '', email: '', ville: '', region: '', specialite: '' })
+  const [editErreur, setEditErreur] = useState('')
+  const [editChargement, setEditChargement] = useState(false)
+
   function updateForm(champ: string, valeur: string) {
     setForm((prev) => ({ ...prev, [champ]: valeur }))
   }
@@ -58,6 +79,32 @@ export default function ComptePage() {
   function getToken() {
     return localStorage.getItem('oncdbf_token')
   }
+
+  // Restaure automatiquement la session si un token valide existe déjà
+  // (évite d'avoir à se reconnecter à chaque changement de page)
+  useEffect(() => {
+    const token = getToken()
+    if (!token) return
+
+    fetch(`${API_BASE}/api/mon-profil/`, {
+      headers: { Authorization: `Token ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Session expirée')
+        return res.json()
+      })
+      .then((donneesPraticien) => {
+        setPraticien(donneesPraticien)
+        setIsLoggedIn(true)
+        if (donneesPraticien.statut === 'actif') {
+          fetchMesFormations()
+          fetchMesModules()
+        }
+      })
+      .catch(() => {
+        localStorage.removeItem('oncdbf_token')
+      })
+  }, [])
 
   async function handleLogin() {
     setErreur('')
@@ -83,7 +130,12 @@ export default function ComptePage() {
       })
 
       if (profilRes.ok) {
-        setPraticien(await profilRes.json())
+        const donneesPraticien = await profilRes.json()
+        setPraticien(donneesPraticien)
+        if (donneesPraticien.statut === 'actif') {
+          fetchMesFormations()
+          fetchMesModules()
+        }
       }
 
       setIsLoggedIn(true)
@@ -125,6 +177,7 @@ export default function ComptePage() {
       donnees.append('ville', form.ville)
       donnees.append('region', form.region)
       donnees.append('specialite', form.specialite)
+      donnees.append('secteur', form.secteur)
       if (diplomeFile) {
         donnees.append('diplome', diplomeFile)
       }
@@ -207,6 +260,126 @@ export default function ComptePage() {
       setAttestationErreur('Impossible de contacter le serveur.')
     } finally {
       setAttestationChargement(false)
+    }
+  }
+
+  async function fetchMesFormations() {
+    setFormationsErreur('')
+    try {
+      const res = await fetch(`${API_BASE}/api/mes-formations/`, {
+        headers: { Authorization: `Token ${getToken()}` },
+      })
+      if (res.ok) {
+        setFormations(await res.json())
+      }
+    } catch (err) {
+      setFormationsErreur('Impossible de charger vos formations.')
+    }
+  }
+
+  async function fetchMesModules() {
+    setModulesErreur('')
+    try {
+      const res = await fetch(`${API_BASE}/api/mes-modules/`, {
+        headers: { Authorization: `Token ${getToken()}` },
+      })
+      if (res.ok) {
+        setModules(await res.json())
+      }
+    } catch (err) {
+      setModulesErreur('Impossible de charger vos modules.')
+    }
+  }
+
+  async function handleTerminerModule(inscriptionId: number) {
+    setModuleEnCours(inscriptionId)
+    try {
+      const res = await fetch(`${API_BASE}/api/terminer-module/${inscriptionId}/`, {
+        method: 'POST',
+        headers: { Authorization: `Token ${getToken()}` },
+      })
+      if (res.ok) {
+        const misAJour = await res.json()
+        setModules((prev) => prev.map((m) => (m.id === misAJour.id ? misAJour : m)))
+      } else {
+        setModulesErreur('Impossible de mettre à jour ce module.')
+      }
+    } catch (err) {
+      setModulesErreur('Impossible de contacter le serveur.')
+    } finally {
+      setModuleEnCours(null)
+    }
+  }
+
+  async function handleDownloadFormation(participationId: number, nomFormation: string) {
+    setFormationEnCours(participationId)
+    try {
+      const res = await fetch(`${API_BASE}/api/mon-attestation-formation/${participationId}/`, {
+        headers: { Authorization: `Token ${getToken()}` },
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        setFormationsErreur(data?.detail || "Impossible de générer cette attestation.")
+        return
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const lien = document.createElement('a')
+      lien.href = url
+      lien.download = `attestation_${nomFormation}.pdf`.replace(/\s+/g, '_')
+      document.body.appendChild(lien)
+      lien.click()
+      lien.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      setFormationsErreur('Impossible de contacter le serveur.')
+    } finally {
+      setFormationEnCours(null)
+    }
+  }
+
+  function startEdit() {
+    setEditForm({
+      telephone: praticien?.telephone || '',
+      email: praticien?.email || '',
+      ville: praticien?.ville || '',
+      region: praticien?.region || REGIONS[0],
+      specialite: praticien?.specialite || '',
+    })
+    setEditErreur('')
+    setModeEdition(true)
+  }
+
+  async function handleSaveProfil() {
+    setEditErreur('')
+    setEditChargement(true)
+    try {
+      const donnees = new FormData()
+      donnees.append('telephone', editForm.telephone)
+      donnees.append('email', editForm.email)
+      donnees.append('ville', editForm.ville)
+      donnees.append('region', editForm.region)
+      donnees.append('specialite', editForm.specialite)
+
+      const res = await fetch(`${API_BASE}/api/mon-profil/`, {
+        method: 'PATCH',
+        headers: { Authorization: `Token ${getToken()}` },
+        body: donnees,
+      })
+
+      if (!res.ok) {
+        setEditErreur('Impossible de sauvegarder les modifications.')
+        return
+      }
+
+      setPraticien(await res.json())
+      setModeEdition(false)
+    } catch (err) {
+      setEditErreur('Impossible de contacter le serveur.')
+    } finally {
+      setEditChargement(false)
     }
   }
 
@@ -339,6 +512,13 @@ export default function ComptePage() {
                   <div>
                     <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Spécialité</label>
                     <input value={form.specialite} onChange={(e) => updateForm('specialite', e.target.value)} placeholder="Ex: Odontologie générale" className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none" style={inputStyle} />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold mb-1.5 block" style={{ color: 'var(--muted-foreground)' }}>Secteur d'exercice</label>
+                    <select value={form.secteur} onChange={(e) => updateForm('secteur', e.target.value)} className="w-full px-3.5 py-2.5 rounded-lg text-sm outline-none" style={inputStyle}>
+                      {SECTEURS.map((s) => <option key={s.valeur} value={s.valeur}>{s.label}</option>)}
+                    </select>
                   </div>
 
                   <div>
@@ -521,22 +701,88 @@ export default function ComptePage() {
                     </button>
                   </div>
 
-                  {[
-                    { titre: 'Certificat de bonne conduite', date: 'Jan 2025' },
-                    { titre: 'Reçu cotisation 2025', date: 'Jan 2025' },
-                    { titre: 'Attestation de formation DPC — Anesthésie', date: 'Mar 2025' },
-                  ].map((doc) => (
-                    <div key={doc.titre} className="flex items-center justify-between p-4 rounded-xl opacity-50" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#999999' }}>PDF</div>
-                        <div>
-                          <div className="font-medium text-sm">{doc.titre}</div>
-                          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Bientôt disponible</div>
-                        </div>
-                      </div>
-                      <button disabled className="text-xs font-semibold cursor-not-allowed" style={{ color: 'var(--muted-foreground)' }}>↓ Télécharger</button>
+                  {formationsErreur && (
+                    <p className="text-xs mb-1" style={{ color: '#B33A3A' }}>{formationsErreur}</p>
+                  )}
+
+                  {formations.length === 0 ? (
+                    <div className="p-4 rounded-xl text-xs text-center" style={{ backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                      Aucune formation suivie pour le moment.
                     </div>
-                  ))}
+                  ) : (
+                    formations.map((p) => (
+                      <div key={p.id} className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#0C4A5A' }}>PDF</div>
+                          <div>
+                            <div className="font-medium text-sm">{p.formation.nom}</div>
+                            <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                              {p.heures_obtenues}h · {p.formation.date_debut}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleDownloadFormation(p.id, p.formation.nom)}
+                          disabled={formationEnCours === p.id}
+                          className="text-xs font-semibold cursor-pointer"
+                          style={{ color: 'var(--primary)', opacity: formationEnCours === p.id ? 0.5 : 1 }}
+                        >
+                          {formationEnCours === p.id ? 'Génération...' : '↓ Télécharger'}
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <h2 className="text-xl font-bold mb-5 mt-10" style={{ fontFamily: 'var(--font-heading)' }}>Mes Modules E-Learning</h2>
+                {modulesErreur && (
+                  <p className="text-xs mb-3" style={{ color: '#B33A3A' }}>{modulesErreur}</p>
+                )}
+                <div className="space-y-3">
+                  {modules.length === 0 ? (
+                    <div className="p-4 rounded-xl text-xs text-center" style={{ backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                      Aucun module suivi pour le moment. Inscrivez-vous depuis la page "Formation".
+                    </div>
+                  ) : (
+                    modules.map((m) => (
+                      <div key={m.id} className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--muted)' }}>🎬</div>
+                          <div>
+                            <div className="font-medium text-sm">{m.module.titre}</div>
+                            <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                              {m.module.duree} · {m.module.niveau}
+                            </div>
+                            {m.module.lien_video && (
+                              
+                                <a href={m.module.lien_video}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-semibold"
+                                style={{ color: 'var(--primary)' }}
+                              >
+                                ▶ Voir la vidéo
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        {m.termine ? (
+                          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
+                            ✅ Terminé
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => handleTerminerModule(m.id)}
+                            disabled={moduleEnCours === m.id}
+                            className="text-xs font-semibold cursor-pointer px-3 py-1.5 rounded-full text-white"
+                            style={{ backgroundColor: 'var(--primary)', opacity: moduleEnCours === m.id ? 0.5 : 1 }}
+                          >
+                            {moduleEnCours === m.id ? '...' : 'Marquer terminé'}
+                          </button>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
 
@@ -574,21 +820,78 @@ export default function ComptePage() {
                     </div>
                   </div>
 
-                  {[
-                    { label: 'Spécialité', value: praticien?.specialite || '—' },
-                    { label: 'Ville', value: praticien?.ville || '—' },
-                    { label: 'Région', value: praticien?.region || '—' },
-                    { label: 'Téléphone', value: praticien?.telephone || '—' },
-                    { label: 'Email', value: praticien?.email || '—' },
-                  ].map((row) => (
-                    <div key={row.label} className="flex justify-between items-center">
-                      <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{row.label}</span>
-                      <span className="text-xs font-semibold text-right">{row.value}</span>
-                    </div>
-                  ))}
-                  <button className="w-full mt-2 py-2.5 rounded-lg text-xs font-semibold cursor-pointer transition-all" style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)', color: 'var(--foreground)' }}>
-                    Modifier mes informations
-                  </button>
+                  {modeEdition ? (
+                    <>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[11px] font-semibold mb-1 block" style={{ color: 'var(--muted-foreground)' }}>Spécialité</label>
+                          <input value={editForm.specialite} onChange={(e) => setEditForm((p) => ({ ...p, specialite: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-xs outline-none" style={inputStyle} />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold mb-1 block" style={{ color: 'var(--muted-foreground)' }}>Ville</label>
+                          <input value={editForm.ville} onChange={(e) => setEditForm((p) => ({ ...p, ville: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-xs outline-none" style={inputStyle} />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold mb-1 block" style={{ color: 'var(--muted-foreground)' }}>Région</label>
+                          <select value={editForm.region} onChange={(e) => setEditForm((p) => ({ ...p, region: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-xs outline-none" style={inputStyle}>
+                            {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold mb-1 block" style={{ color: 'var(--muted-foreground)' }}>Téléphone</label>
+                          <input value={editForm.telephone} onChange={(e) => setEditForm((p) => ({ ...p, telephone: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-xs outline-none" style={inputStyle} />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-semibold mb-1 block" style={{ color: 'var(--muted-foreground)' }}>Email</label>
+                          <input type="email" value={editForm.email} onChange={(e) => setEditForm((p) => ({ ...p, email: e.target.value }))} className="w-full px-3 py-2 rounded-lg text-xs outline-none" style={inputStyle} />
+                        </div>
+                      </div>
+
+                      {editErreur && <p className="text-[11px]" style={{ color: '#B33A3A' }}>{editErreur}</p>}
+
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={handleSaveProfil}
+                          disabled={editChargement}
+                          className="flex-1 py-2.5 rounded-lg text-xs font-semibold cursor-pointer text-white"
+                          style={{ backgroundColor: 'var(--primary)', opacity: editChargement ? 0.6 : 1 }}
+                        >
+                          {editChargement ? 'Enregistrement...' : 'Enregistrer'}
+                        </button>
+                        <button
+                          onClick={() => setModeEdition(false)}
+                          disabled={editChargement}
+                          className="flex-1 py-2.5 rounded-lg text-xs font-semibold cursor-pointer"
+                          style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {[
+                        { label: 'Spécialité', value: praticien?.specialite || '—' },
+                        { label: 'Secteur', value: SECTEURS.find((s) => s.valeur === praticien?.secteur)?.label || '—' },
+                        { label: 'Ville', value: praticien?.ville || '—' },
+                        { label: 'Région', value: praticien?.region || '—' },
+                        { label: 'Téléphone', value: praticien?.telephone || '—' },
+                        { label: 'Email', value: praticien?.email || '—' },
+                      ].map((row) => (
+                        <div key={row.label} className="flex justify-between items-center">
+                          <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{row.label}</span>
+                          <span className="text-xs font-semibold text-right">{row.value}</span>
+                        </div>
+                      ))}
+                      <button
+                        onClick={startEdit}
+                        className="w-full mt-2 py-2.5 rounded-lg text-xs font-semibold cursor-pointer transition-all"
+                        style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)', color: 'var(--foreground)' }}
+                      >
+                        Modifier mes informations
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
