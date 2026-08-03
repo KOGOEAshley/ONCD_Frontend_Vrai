@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { Page } from '../components/NavBar'
 import {
   ClipboardList, CreditCard, Building2, FileText, BookMarked, Megaphone,
@@ -42,6 +42,7 @@ const services = [
     badge: "Démarche",
     badgeColor: '#E8EDF5',
     badgeText: '#2A3E6B',
+    tab: 'inscription',
   },
   {
     icon: CreditCard,
@@ -50,6 +51,7 @@ const services = [
     badge: "Finance",
     badgeColor: '#E8F5EC',
     badgeText: '#2A6B3E',
+    tab: 'inscription',
   },
   {
     icon: Building2,
@@ -58,6 +60,7 @@ const services = [
     badge: "Installation",
     badgeColor: '#FEF3E8',
     badgeText: '#875A00',
+    tab: 'installation',
   },
   {
     icon: FileText,
@@ -66,6 +69,7 @@ const services = [
     badge: "Juridique",
     badgeColor: '#FDEADE',
     badgeText: '#C4622D',
+    tab: 'juridique',
   },
   {
     icon: BookMarked,
@@ -74,6 +78,7 @@ const services = [
     badge: "Documents",
     badgeColor: '#F3E8FE',
     badgeText: '#6B2A9B',
+    tab: 'attestations',
   },
   {
     icon: Megaphone,
@@ -82,6 +87,7 @@ const services = [
     badge: "Déontologie",
     badgeColor: '#E8F0FE',
     badgeText: '#1A3D8B',
+    tab: 'installation',
   },
 ]
 
@@ -94,6 +100,7 @@ const cotisations = [
 
 export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
   const [activeTab, setActiveTab] = useState('inscription')
+  const tabsRef = useRef<HTMLDivElement>(null)
   const [documentsJuridiques, setDocumentsJuridiques] = useState<any[]>([])
 
   useEffect(() => {
@@ -109,8 +116,11 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      <div style={{ backgroundColor: '#0C4A5A' }} className="px-6 py-16">
-        <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#0C4A5A', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90C4A0' }}>
             Espace Professionnel
           </p>
@@ -126,6 +136,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
         </div>
       </div>
 
+      {/* Alert */}
       <div
         className="px-6 py-3 text-sm flex items-center gap-3"
         style={{ backgroundColor: '#FEF3E8', borderBottom: '1px solid #F6D5AF' }}
@@ -139,6 +150,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Services grid */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
             Vos services en ligne
@@ -147,6 +159,10 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
             {services.map((s) => (
               <div
                 key={s.title}
+                onClick={() => {
+                  setActiveTab(s.tab)
+                  tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }}
                 className="p-6 rounded-xl cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition-all group"
                 style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
               >
@@ -175,7 +191,8 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
           </div>
         </div>
 
-        <div>
+        {/* Tabs section */}
+        <div ref={tabsRef}>
           <div className="flex gap-1 p-1 rounded-xl mb-8 flex-wrap" style={{ backgroundColor: 'var(--muted)' }}>
             {tabs.map((tab) => (
               <button
@@ -307,8 +324,8 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
                   </p>
                 ) : (
                   documentsJuridiques.map((doc) => (
-                    
-                     <a key={doc.id}
+                    <a
+                      key={doc.id}
                       href={doc.url}
                       target="_blank"
                       rel="noopener noreferrer"

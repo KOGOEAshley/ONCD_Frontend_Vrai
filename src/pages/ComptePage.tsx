@@ -1,4 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import {
+  ArrowRight, ArrowLeft, CheckCircle2, GraduationCap, CalendarDays,
+  Download, Video, Play, Clock,
+} from 'lucide-react'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
@@ -34,9 +38,11 @@ export default function ComptePage() {
   const [messageSucces, setMessageSucces] = useState('')
   const [chargement, setChargement] = useState(false)
 
+  // --- Connexion ---
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  // --- Inscription ---
   const [form, setForm] = useState({
     nom: '',
     prenom: '',
@@ -52,6 +58,7 @@ export default function ComptePage() {
   })
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
 
+  // --- Upload photo (Mon Profil) ---
   const [photoEnvoi, setPhotoEnvoi] = useState(false)
   const [photoErreur, setPhotoErreur] = useState('')
   const photoInputRef = useRef<HTMLInputElement>(null)
@@ -167,6 +174,7 @@ export default function ComptePage() {
     }
 
     try {
+      // FormData (et non JSON) car on envoie potentiellement un fichier (diplôme)
       const donnees = new FormData()
       donnees.append('username', form.username)
       donnees.append('password', form.passwordInscription)
@@ -182,6 +190,8 @@ export default function ComptePage() {
         donnees.append('diplome', diplomeFile)
       }
 
+      // Pas de header "Content-Type" ici : le navigateur le génère lui-même
+      // avec la bonne "boundary" pour un envoi multipart/form-data
       const res = await fetch(`${API_BASE}/api/inscription/`, {
         method: 'POST',
         body: donnees,
@@ -247,6 +257,7 @@ export default function ComptePage() {
         return
       }
 
+      // Le PDF arrive en "blob" (données binaires) : on crée un lien de téléchargement temporaire
       const blob = await res.blob()
       const url = window.URL.createObjectURL(blob)
       const lien = document.createElement('a')
@@ -397,12 +408,11 @@ export default function ComptePage() {
       <div style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--background)' }} className="min-h-screen flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold mx-auto mb-4"
-              style={{ backgroundColor: 'var(--accent)' }}
-            >
-              ✦
-            </div>
+            <img
+              src="/logo-oncdbf.png"
+              alt="Logo ONCD Burkina"
+              className="w-14 h-14 rounded-full mx-auto mb-4 bg-white"
+            />
             <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
               Espace Membre
             </h1>
@@ -465,10 +475,10 @@ export default function ComptePage() {
                   </p>
                   <button
                     onClick={() => { setMode('inscription'); setErreur('') }}
-                    className="w-full py-3 rounded-lg font-semibold text-sm transition-all cursor-pointer"
+                    className="w-full py-3 rounded-lg font-semibold text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
                     style={{ backgroundColor: 'var(--muted)', color: 'var(--foreground)', border: '1px solid var(--border)' }}
                   >
-                    Demander mon inscription →
+                    Demander mon inscription <ArrowRight size={16} />
                   </button>
                 </div>
               </>
@@ -576,10 +586,10 @@ export default function ComptePage() {
 
                 <button
                   onClick={() => { setMode('login'); setErreur('') }}
-                  className="w-full text-xs text-center cursor-pointer py-2"
+                  className="w-full text-xs text-center cursor-pointer py-2 flex items-center justify-center gap-1"
                   style={{ color: 'var(--muted-foreground)' }}
                 >
-                  ← J'ai déjà un compte
+                  <ArrowLeft size={14} /> J'ai déjà un compte
                 </button>
               </>
             )}
@@ -594,6 +604,7 @@ export default function ComptePage() {
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
+      {/* Dashboard header */}
       <div style={{ backgroundColor: 'var(--primary)' }} className="px-6 py-12">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -631,10 +642,10 @@ export default function ComptePage() {
       <div className="max-w-7xl mx-auto px-6 py-10">
         {messageSucces && (
           <div
-            className="mb-8 p-5 rounded-xl text-sm"
+            className="mb-8 p-5 rounded-xl text-sm flex items-center gap-2"
             style={{ backgroundColor: '#FEF3E8', color: '#875A00', border: '1px solid #F0DDB8' }}
           >
-            ✅ {messageSucces}
+            <CheckCircle2 size={18} className="flex-shrink-0" /> {messageSucces}
           </div>
         )}
 
@@ -643,7 +654,7 @@ export default function ComptePage() {
             className="p-8 rounded-2xl text-center"
             style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
           >
-            <div className="text-3xl mb-3">⏳</div>
+            <Clock size={40} className="mx-auto mb-3" style={{ color: 'var(--accent)' }} />
             <h2 className="text-lg font-bold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
               Votre demande est en cours d'examen
             </h2>
@@ -657,9 +668,9 @@ export default function ComptePage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
               {[
-                { label: 'Cotisation 2025', value: 'À jour', sub: 'Payé le 15 Jan 2025', icon: '✅', color: '#E8F5EC', textColor: '#2A6B3E' },
-                { label: 'Heures DPC', value: '14 / 20h', sub: 'Objectif annuel', icon: '🎓', color: '#E8EDF5', textColor: '#2A3E6B' },
-                { label: 'Prochain événement', value: 'Congrès ONCD', sub: '14–16 Nov 2025', icon: '📅', color: '#FEF3E8', textColor: '#875A00' },
+                { label: 'Cotisation 2025', value: 'À jour', sub: 'Payé le 15 Jan 2025', icon: CheckCircle2, color: '#E8F5EC', textColor: '#2A6B3E' },
+                { label: 'Heures DPC', value: '14 / 20h', sub: 'Objectif annuel', icon: GraduationCap, color: '#E8EDF5', textColor: '#2A3E6B' },
+                { label: 'Prochain événement', value: 'Congrès ONCD', sub: '14–16 Nov 2025', icon: CalendarDays, color: '#FEF3E8', textColor: '#875A00' },
               ].map((s) => (
                 <div key={s.label} className="p-5 rounded-xl" style={{ backgroundColor: s.color }}>
                   <div className="flex items-start justify-between">
@@ -668,7 +679,7 @@ export default function ComptePage() {
                       <div className="text-xl font-bold mb-1" style={{ color: s.textColor, fontFamily: 'var(--font-heading)' }}>{s.value}</div>
                       <div className="text-xs" style={{ color: `${s.textColor}99` }}>{s.sub}</div>
                     </div>
-                    <span className="text-2xl">{s.icon}</span>
+                    <s.icon size={22} style={{ color: s.textColor }} />
                   </div>
                 </div>
               ))}
@@ -681,6 +692,7 @@ export default function ComptePage() {
                   <p className="text-xs mb-3" style={{ color: '#B33A3A' }}>{attestationErreur}</p>
                 )}
                 <div className="space-y-3">
+                  {/* Attestation réelle, générée par le serveur */}
                   <div className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#C4622D' }}>PDF</div>
@@ -694,13 +706,14 @@ export default function ComptePage() {
                     <button
                       onClick={handleDownloadAttestation}
                       disabled={attestationChargement}
-                      className="text-xs font-semibold cursor-pointer"
+                      className="text-xs font-semibold cursor-pointer flex items-center gap-1"
                       style={{ color: 'var(--primary)', opacity: attestationChargement ? 0.5 : 1 }}
                     >
-                      {attestationChargement ? 'Génération...' : '↓ Télécharger'}
+                      {attestationChargement ? 'Génération...' : <><Download size={14} /> Télécharger</>}
                     </button>
                   </div>
 
+                  {/* Documents pas encore développés : affichés mais désactivés, pour rester honnête */}
                   {formationsErreur && (
                     <p className="text-xs mb-1" style={{ color: '#B33A3A' }}>{formationsErreur}</p>
                   )}
@@ -724,10 +737,10 @@ export default function ComptePage() {
                         <button
                           onClick={() => handleDownloadFormation(p.id, p.formation.nom)}
                           disabled={formationEnCours === p.id}
-                          className="text-xs font-semibold cursor-pointer"
+                          className="text-xs font-semibold cursor-pointer flex items-center gap-1"
                           style={{ color: 'var(--primary)', opacity: formationEnCours === p.id ? 0.5 : 1 }}
                         >
-                          {formationEnCours === p.id ? 'Génération...' : '↓ Télécharger'}
+                          {formationEnCours === p.id ? 'Génération...' : <><Download size={14} /> Télécharger</>}
                         </button>
                       </div>
                     ))
@@ -747,28 +760,28 @@ export default function ComptePage() {
                     modules.map((m) => (
                       <div key={m.id} className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg" style={{ backgroundColor: 'var(--muted)' }}>🎬</div>
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--muted)' }}><Video size={16} /></div>
                           <div>
                             <div className="font-medium text-sm">{m.module.titre}</div>
                             <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
                               {m.module.duree} · {m.module.niveau}
                             </div>
                             {m.module.lien_video && (
-                              
-                                <a href={m.module.lien_video}
+                              <a
+                                href={m.module.lien_video}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs font-semibold"
+                                className="text-xs font-semibold flex items-center gap-1"
                                 style={{ color: 'var(--primary)' }}
                               >
-                                ▶ Voir la vidéo
+                                <Play size={12} /> Voir la vidéo
                               </a>
                             )}
                           </div>
                         </div>
                         {m.termine ? (
-                          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
-                            ✅ Terminé
+                          <span className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
+                            <CheckCircle2 size={14} /> Terminé
                           </span>
                         ) : (
                           <button
@@ -789,6 +802,7 @@ export default function ComptePage() {
               <div>
                 <h2 className="text-xl font-bold mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Mon Profil</h2>
                 <div className="rounded-xl p-5 space-y-4" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
+                  {/* Photo de profil */}
                   <div className="flex items-center gap-3 pb-4" style={{ borderBottom: '1px solid var(--border)' }}>
                     {photoUrl ? (
                       <img src={photoUrl} alt="Photo de profil" className="w-14 h-14 rounded-full object-cover" />

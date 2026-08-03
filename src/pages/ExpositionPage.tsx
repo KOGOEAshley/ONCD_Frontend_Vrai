@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { CalendarDays, MapPin, Building2, ArrowRight, CheckCircle2, Globe, Mail } from 'lucide-react'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
@@ -46,6 +47,7 @@ export default function ExpositionPage() {
 
   const filtered = catFilter === 'Tous' ? exposants : exposants.filter((e) => e.categorie === catFilter)
 
+  // --- Formulaire de réservation de stand ---
   const [formulaireOuvert, setFormulaireOuvert] = useState(false)
   const [reservation, setReservation] = useState({
     nom_entreprise: '', email: '', telephone: '', pays: '', categorie_souhaitee: categories[1], message: '',
@@ -84,11 +86,11 @@ export default function ExpositionPage() {
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      <div
-        style={{ background: 'linear-gradient(135deg, #2A1A0E 0%, #5C2A0E 100%)' }}
-        className="px-6 py-16"
-      >
-        <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #2A1A0E 0%, #5C2A0E 100%)', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#E8956A' }}>
             Innovation & Équipements
           </p>
@@ -103,28 +105,29 @@ export default function ExpositionPage() {
           </p>
           <div className="mt-6 flex gap-4 flex-wrap text-sm">
             <div
-              className="px-4 py-2 rounded-lg"
+              className="px-4 py-2 rounded-lg flex items-center gap-2"
               style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
             >
-              📅 14–16 Novembre 2025
+              <CalendarDays size={16} /> 14–16 Novembre 2025
             </div>
             <div
-              className="px-4 py-2 rounded-lg"
+              className="px-4 py-2 rounded-lg flex items-center gap-2"
               style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
             >
-              📍 Palais des Congrès, Ouagadougou
+              <MapPin size={16} /> Palais des Congrès, Ouagadougou
             </div>
             <div
-              className="px-4 py-2 rounded-lg"
+              className="px-4 py-2 rounded-lg flex items-center gap-2"
               style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
             >
-              🏢 28 stands d'exposition
+              <Building2 size={16} /> 28 stands d'exposition
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Become an exhibitor CTA */}
         <div
           className="rounded-2xl p-8 mb-12 flex flex-col md:flex-row items-center justify-between gap-6"
           style={{ backgroundColor: 'var(--muted)', border: '1px solid var(--border)' }}
@@ -140,10 +143,10 @@ export default function ExpositionPage() {
           <div className="flex gap-3 flex-shrink-0">
             <button
               onClick={() => { setFormulaireOuvert((v) => !v); setMessageReservation('') }}
-              className="px-6 py-3 rounded-lg text-sm font-semibold text-white cursor-pointer hover:opacity-90 transition-all"
+              className="px-6 py-3 rounded-lg text-sm font-semibold text-white cursor-pointer hover:opacity-90 transition-all flex items-center gap-1.5"
               style={{ backgroundColor: 'var(--accent)' }}
             >
-              Réserver un stand →
+              Réserver un stand <ArrowRight size={16} />
             </button>
             <button
               onClick={() => catalogueRef.current?.scrollIntoView({ behavior: 'smooth' })}
@@ -160,8 +163,8 @@ export default function ExpositionPage() {
             <h3 className="text-lg font-bold mb-5" style={{ fontFamily: 'var(--font-heading)' }}>Demande de réservation de stand</h3>
 
             {messageReservation ? (
-              <p className="text-sm p-4 rounded-lg" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
-                ✅ {messageReservation}
+              <p className="text-sm p-4 rounded-lg flex items-center gap-2" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
+                <CheckCircle2 size={16} className="flex-shrink-0" /> {messageReservation}
               </p>
             ) : (
               <>
@@ -209,6 +212,7 @@ export default function ExpositionPage() {
           </div>
         )}
 
+        {/* Filter */}
         <div ref={catalogueRef} className="flex items-center justify-between mb-6 flex-wrap gap-4">
           <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
             Exposants 2025
@@ -238,62 +242,62 @@ export default function ExpositionPage() {
               style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
             >
               <div className={`p-6 ${e.photoStandUrl ? 'sm:w-3/5' : 'w-full'}`}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-2.5">
-                    {e.logoUrl ? (
-                      <img
-                        src={e.logoUrl}
-                        alt={`Logo ${e.nom}`}
-                        className="w-10 h-10 rounded-lg object-contain bg-white border"
-                        style={{ borderColor: 'var(--border)' }}
-                      />
-                    ) : (
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-                        style={{ backgroundColor: 'var(--primary)' }}
-                      >
-                        {e.stand}
-                      </div>
-                    )}
-                  </div>
-                  <span
-                    className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: catColor[e.categorie]?.bg ?? '#F5F5F5',
-                      color: catColor[e.categorie]?.text ?? '#333',
-                    }}
-                  >
-                    {e.categorie}
-                  </span>
-                </div>
-                {e.logoUrl && (
-                  <div
-                    className="inline-block text-xs font-semibold px-2 py-0.5 rounded mb-2"
-                    style={{ backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)' }}
-                  >
-                    Stand {e.stand}
-                  </div>
-                )}
-                <h3
-                  className="font-bold text-sm mb-1"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  {e.nom}
-                </h3>
-                <p className="text-xs mb-3" style={{ color: 'var(--muted-foreground)' }}>
-                  🌍 {e.pays}
-                </p>
-                <div className="space-y-1 mb-4">
-                  {e.produits.map((p: string) => (
-                    <div key={p} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                      <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--secondary)' }} />
-                      {p}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  {e.logoUrl ? (
+                    <img
+                      src={e.logoUrl}
+                      alt={`Logo ${e.nom}`}
+                      className="w-10 h-10 rounded-lg object-contain bg-white border"
+                      style={{ borderColor: 'var(--border)' }}
+                    />
+                  ) : (
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                      style={{ backgroundColor: 'var(--primary)' }}
+                    >
+                      {e.stand}
                     </div>
-                  ))}
+                  )}
                 </div>
-                <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                  ✉️ {e.contact}
+                <span
+                  className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                  style={{
+                    backgroundColor: catColor[e.categorie]?.bg ?? '#F5F5F5',
+                    color: catColor[e.categorie]?.text ?? '#333',
+                  }}
+                >
+                  {e.categorie}
+                </span>
+              </div>
+              {e.logoUrl && (
+                <div
+                  className="inline-block text-xs font-semibold px-2 py-0.5 rounded mb-2"
+                  style={{ backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)' }}
+                >
+                  Stand {e.stand}
                 </div>
+              )}
+              <h3
+                className="font-bold text-sm mb-1"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                {e.nom}
+              </h3>
+              <p className="text-xs mb-3 flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                <Globe size={12} /> {e.pays}
+              </p>
+              <div className="space-y-1 mb-4">
+                {e.produits.map((p: string) => (
+                  <div key={p} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                    <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--secondary)' }} />
+                    {p}
+                  </div>
+                ))}
+              </div>
+              <div className="text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                <Mail size={12} /> {e.contact}
+              </div>
               </div>
               {e.photoStandUrl && (
                 <img

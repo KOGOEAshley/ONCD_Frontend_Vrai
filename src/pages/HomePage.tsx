@@ -3,9 +3,8 @@ import type { Page } from '../components/NavBar'
 import CompteurAnime from '../components/CompteurAnime'
 import {
   Stethoscope, GraduationCap, Users, MapPin, Landmark, Smile,
-  CalendarDays, Store, BarChart3, Newspaper,
+  CalendarDays, Store, BarChart3, Newspaper, ArrowRight,
 } from 'lucide-react'
-
 
 interface HomePageProps {
   onNavigate: (page: Page) => void
@@ -82,6 +81,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         className="relative overflow-hidden"
         style={{ backgroundColor: 'var(--primary)', minHeight: '540px' }}
       >
+        {/* Background pattern */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -127,10 +127,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => onNavigate('annuaire')}
-                className="px-6 py-3 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90 cursor-pointer"
+                className="px-6 py-3 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90 cursor-pointer flex items-center gap-1.5"
                 style={{ backgroundColor: 'var(--accent)' }}
               >
-                Trouver un dentiste →
+                Trouver un dentiste <ArrowRight size={16} />
               </button>
               <button
                 onClick={() => onNavigate('institution')}
@@ -148,7 +148,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
           {/* Stats */}
           <div className="relative rounded-xl overflow-hidden min-h-[420px]">
-          
+            {/* Image de fond, balayage révélé de gauche à droite */}
             <div
               className="absolute inset-0 animate-wipe-reveal-left"
               style={{
@@ -157,9 +157,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 backgroundPosition: 'center',
               }}
             />
+            {/* Voile sombre pour garder le texte lisible par-dessus l'image */}
             <div className="absolute inset-0" style={{ backgroundColor: 'rgba(12,58,60,0.6)' }} />
 
-            <div className="relative grid grid-cols-2 gap-3 p-4 animate-slide-in-right">
+            <div className="relative h-full flex items-center p-6">
               <div className="grid grid-cols-2 gap-3 w-full animate-slide-in-right">
               {stats.map((stat) => (
                 <div
@@ -167,6 +168,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   className="rounded-lg p-3.5 backdrop-blur-sm"
                   style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}
                 >
+                  <stat.icon size={18} className="text-white/70 mb-1.5" strokeWidth={1.75} />
                   <div
                     className="text-xl font-bold text-white mb-0.5"
                     style={{ fontFamily: 'var(--font-heading)' }}
@@ -203,7 +205,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <div
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-white group-hover:gap-2.5 transition-all"
               >
-                {card.cta} <span>→</span>
+                {card.cta} <ArrowRight size={14} />
               </div>
             </button>
           ))}
@@ -250,10 +252,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
           <button
             onClick={() => onNavigate('actualites')}
-            className="text-sm font-medium text-primary cursor-pointer"
+            className="text-sm font-medium text-primary cursor-pointer flex items-center gap-1"
             style={{ color: 'var(--primary)' }}
           >
-            Toutes les actualités →
+            Toutes les actualités <ArrowRight size={14} />
           </button>
         </div>
 

@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react'
+import {
+  ClipboardList, GraduationCap, Building2, Phone, MapPin, Smile, CalendarDays,
+  CheckCircle2, Download, Handshake, Wallet, UserCheck, Mic, ArrowRight,
+} from 'lucide-react'
 
 const parcours = [
   { annee: 'PACES / L1', titre: 'Première Année', desc: "Tronc commun des études de santé. Concours d'accès aux études de chirurgie dentaire." },
@@ -29,6 +33,7 @@ function adapterStage(s: any) {
   }
 }
 
+
 export default function EtudiantsPage() {
   const [tab, setTab] = useState('parcours')
   const tabs = [
@@ -47,6 +52,7 @@ export default function EtudiantsPage() {
       .catch((err) => console.error('Erreur API stages :', err))
   }, [])
 
+  // --- Formulaire de candidature ---
   const [candidatureOuverte, setCandidatureOuverte] = useState<number | null>(null)
   const [candidature, setCandidature] = useState({ nom: '', prenom: '', email: '', telephone: '', niveau_actuel: '', message: '' })
   const [cvFile, setCvFile] = useState<File | null>(null)
@@ -100,8 +106,11 @@ export default function EtudiantsPage() {
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      <div style={{ backgroundColor: '#2A3E6B' }} className="px-6 py-16">
-        <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#2A3E6B', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90A8D4' }}>
             Futurs Chirurgiens-Dentistes
           </p>
@@ -118,19 +127,20 @@ export default function EtudiantsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-10">
+        {/* Quick links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { icon: '📋', label: "M'inscrire à l'Ordre", sub: 'Dès l\'obtention du diplôme' },
-            { icon: '🎓', label: 'Bourse & Aides', sub: 'Fonds de soutien étudiant' },
-            { icon: '🏥', label: 'Trouver un Stage', sub: '15 terrains disponibles' },
-            { icon: '📞', label: 'Aide & Conseil', sub: 'Référent étudiant ONCD' },
+            { icon: ClipboardList, label: "M'inscrire à l'Ordre", sub: 'Dès l\'obtention du diplôme' },
+            { icon: GraduationCap, label: 'Bourse & Aides', sub: 'Fonds de soutien étudiant' },
+            { icon: Building2, label: 'Trouver un Stage', sub: '15 terrains disponibles' },
+            { icon: Phone, label: 'Aide & Conseil', sub: 'Référent étudiant ONCD' },
           ].map((item) => (
             <div
               key={item.label}
               className="p-5 rounded-xl cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition-all"
               style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
             >
-              <div className="text-2xl mb-2">{item.icon}</div>
+              <item.icon size={24} className="mb-2" style={{ color: 'var(--primary)' }} strokeWidth={1.75} />
               <div className="font-semibold text-sm">{item.label}</div>
               <div className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
                 {item.sub}
@@ -139,6 +149,7 @@ export default function EtudiantsPage() {
           ))}
         </div>
 
+        {/* Tabs */}
         <div className="flex gap-1 p-1 rounded-xl mb-8 flex-wrap" style={{ backgroundColor: 'var(--muted)' }}>
           {tabs.map((t) => (
             <button
@@ -207,7 +218,11 @@ export default function EtudiantsPage() {
                     <div className="flex-1">
                       <div className="font-semibold text-sm mb-1">{s.etablissement}</div>
                       <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                        📍 {s.ville} · 🦷 {s.specialite} · 📅 {s.periode}
+                        <span className="inline-flex items-center gap-1"><MapPin size={12} /> {s.ville}</span>
+                        {' · '}
+                        <span className="inline-flex items-center gap-1"><Smile size={12} /> {s.specialite}</span>
+                        {' · '}
+                        <span className="inline-flex items-center gap-1"><CalendarDays size={12} /> {s.periode}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-4 flex-shrink-0">
@@ -236,8 +251,8 @@ export default function EtudiantsPage() {
                   {candidatureOuverte === s.id && (
                     <div className="mt-5 pt-5" style={{ borderTop: '1px solid var(--border)' }}>
                       {messageCandidature ? (
-                        <p className="text-sm p-4 rounded-lg" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
-                          ✅ {messageCandidature}
+                        <p className="text-sm p-4 rounded-lg flex items-center gap-2" style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}>
+                          <CheckCircle2 size={16} className="flex-shrink-0" /> {messageCandidature}
                         </p>
                       ) : (
                         <>
@@ -298,8 +313,8 @@ export default function EtudiantsPage() {
                       </div>
                     </div>
                   </div>
-                  <button className="text-sm font-semibold cursor-pointer" style={{ color: 'var(--primary)' }}>
-                    ↓ Télécharger
+                  <button className="text-sm font-semibold cursor-pointer flex items-center gap-1" style={{ color: 'var(--primary)' }}>
+                    <Download size={14} /> Télécharger
                   </button>
                 </div>
               ))}
@@ -312,25 +327,25 @@ export default function EtudiantsPage() {
             {[
               {
                 title: 'Association des Étudiants Dentistes du Burkina',
-                icon: '🤝',
+                icon: Handshake,
                 desc: "L'AEDB représente les étudiants en chirurgie dentaire. Activités, entraide, défense des droits.",
                 cta: 'Rejoindre l\'AEDB',
               },
               {
                 title: 'Aide Financière & Bourses',
-                icon: '💰',
+                icon: Wallet,
                 desc: "Le Fonds de Solidarité de l'ONCD accorde des aides ponctuelles aux étudiants en difficulté financière.",
                 cta: 'Demander une aide',
               },
               {
                 title: 'Mentorat Professionnel',
-                icon: '🧑‍🏫',
+                icon: UserCheck,
                 desc: "Chaque étudiant en D4 peut bénéficier d'un praticien mentor pour l'accompagner dans son installation.",
                 cta: 'Trouver un mentor',
               },
               {
                 title: 'Congrès Junior & Cas Cliniques',
-                icon: '🎤',
+                icon: Mic,
                 desc: 'Concours de présentation de cas cliniques réservé aux étudiants, intégré au Congrès National.',
                 cta: 'Participer 2025',
               },
@@ -340,15 +355,15 @@ export default function EtudiantsPage() {
                 className="p-6 rounded-xl"
                 style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
               >
-                <div className="text-3xl mb-4">{item.icon}</div>
+                <item.icon size={28} className="mb-4" style={{ color: 'var(--accent)' }} strokeWidth={1.75} />
                 <h3 className="font-bold text-sm mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
                   {item.title}
                 </h3>
                 <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--muted-foreground)' }}>
                   {item.desc}
                 </p>
-                <button className="text-xs font-semibold cursor-pointer" style={{ color: 'var(--primary)' }}>
-                  {item.cta} →
+                <button className="text-xs font-semibold cursor-pointer flex items-center gap-1" style={{ color: 'var(--primary)' }}>
+                  {item.cta} <ArrowRight size={12} />
                 </button>
               </div>
             ))}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
+import { MapPin, Siren } from 'lucide-react'
 
 function adapterClinique(c: any) {
   return {
@@ -51,8 +52,10 @@ export default function GeolocalisationPage() {
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
       {/* Header */}
-      <div style={{ backgroundColor: '#1C2B3A' }} className="px-6 py-14">
-        <div className="max-w-7xl mx-auto">
+      <div className="relative overflow-hidden px-6 py-14">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#7BAFD4' }}>
             Carte Interactive
           </p>
@@ -194,16 +197,16 @@ export default function GeolocalisationPage() {
                     >
                       {selectedClinique.nom}
                     </h3>
-                    <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                      📍 {selectedClinique.adresse}
+                    <p className="text-sm flex items-center gap-1.5" style={{ color: 'var(--muted-foreground)' }}>
+                      <MapPin size={14} /> {selectedClinique.adresse}
                     </p>
                   </div>
                   {selectedClinique.urgences && (
                     <span
-                      className="text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0"
+                      className="text-xs font-bold px-3 py-1.5 rounded-full flex-shrink-0 flex items-center gap-1"
                       style={{ backgroundColor: '#FDEADE', color: '#C4622D' }}
                     >
-                      🚨 Urgences 24h
+                      <Siren size={14} /> Urgences 24h
                     </span>
                   )}
                 </div>

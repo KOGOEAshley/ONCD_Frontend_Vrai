@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Star, MapPin, ArrowRight, CalendarDays, Circle, Video, Clock3 } from 'lucide-react'
 
 const MOIS_COURTS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
 
@@ -36,6 +37,7 @@ function adapterModule(m: any) {
     duration: m.duree,
     level: m.niveau,
     enrolled: m.nombre_inscrits,
+    lienVideo: m.lien_video,
   }
 }
 
@@ -86,6 +88,7 @@ export default function FormationPage() {
         return
       }
       setMessageModule((prev) => ({ ...prev, [moduleId]: data.message }))
+      // Met à jour le compteur d'inscrits affiché sans recharger toute la page
       setElearning((prev) =>
         prev.map((m) => (m.id === moduleId ? { ...m, enrolled: m.enrolled + 1 } : m))
       )
@@ -96,8 +99,11 @@ export default function FormationPage() {
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      <div style={{ backgroundColor: '#2A3E6B' }} className="px-6 py-16">
-        <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#2A3E6B', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90A8D4' }}>
             Développement Professionnel
           </p>
@@ -114,6 +120,7 @@ export default function FormationPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Featured event */}
         {events
           .filter((e) => e.featured)
           .map((event) => (
@@ -126,10 +133,10 @@ export default function FormationPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-4">
                     <span
-                      className="text-xs font-bold px-3 py-1 rounded-full"
+                      className="text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"
                       style={{ backgroundColor: 'var(--accent)', color: 'white' }}
                     >
-                      ⭐ Événement Phare
+                      <Star size={12} /> Événement Phare
                     </span>
                     <span className="text-white/60 text-xs">{event.date}</span>
                   </div>
@@ -139,7 +146,7 @@ export default function FormationPage() {
                   >
                     {event.title}
                   </h2>
-                  <p className="text-white/65 text-sm mb-4">📍 {event.location}</p>
+                  <p className="text-white/65 text-sm mb-4 flex items-center gap-1.5"><MapPin size={14} /> {event.location}</p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {event.tags.map((tag: string) => (
                       <span
@@ -164,10 +171,10 @@ export default function FormationPage() {
                 </div>
                 <div className="flex flex-col gap-3 min-w-40">
                   <button
-                    className="px-6 py-3 rounded-lg font-semibold text-sm text-white cursor-pointer hover:opacity-90 transition-all"
+                    className="px-6 py-3 rounded-lg font-semibold text-sm text-white cursor-pointer hover:opacity-90 transition-all flex items-center justify-center gap-1.5"
                     style={{ backgroundColor: 'var(--accent)' }}
                   >
-                    S'inscrire →
+                    S'inscrire <ArrowRight size={16} />
                   </button>
                   <button
                     className="px-6 py-3 rounded-lg font-semibold text-sm cursor-pointer transition-all"
@@ -177,6 +184,7 @@ export default function FormationPage() {
                   </button>
                 </div>
               </div>
+              {/* Progress bar */}
               <div className="mx-8 md:mx-10 mb-8">
                 <div className="flex justify-between text-xs text-white/50 mb-1.5">
                   <span>Taux de remplissage</span>
@@ -195,6 +203,7 @@ export default function FormationPage() {
             </div>
           ))}
 
+        {/* Event filters */}
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
           <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
             Prochains Événements
@@ -244,11 +253,11 @@ export default function FormationPage() {
                 >
                   {event.title}
                 </h3>
-                <p className="text-xs mb-1" style={{ color: 'var(--muted-foreground)' }}>
-                  📅 {event.date}
+                <p className="text-xs mb-1 flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                  <CalendarDays size={12} /> {event.date}
                 </p>
-                <p className="text-xs mb-4" style={{ color: 'var(--muted-foreground)' }}>
-                  📍 {event.location}
+                <p className="text-xs mb-4 flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                  <MapPin size={12} /> {event.location}
                 </p>
                 <div className="flex flex-wrap gap-1 mb-4">
                   {event.tags.map((tag: string) => (
@@ -262,14 +271,15 @@ export default function FormationPage() {
                   ))}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: event.spots < 10 ? '#C4622D' : 'var(--muted-foreground)' }}>
-                    {event.spots < 10 ? '🔴 ' : ''}{event.spots} places restantes
+                  <span className="text-xs flex items-center gap-1" style={{ color: event.spots < 10 ? '#C4622D' : 'var(--muted-foreground)' }}>
+                    {event.spots < 10 && <Circle size={8} fill="#C4622D" stroke="none" />}
+                    {event.spots} places restantes
                   </span>
                   <button
-                    className="text-xs font-semibold cursor-pointer"
+                    className="text-xs font-semibold cursor-pointer flex items-center gap-1"
                     style={{ color: 'var(--primary)' }}
                   >
-                    Détails →
+                    Détails <ArrowRight size={12} />
                   </button>
                 </div>
               </div>
@@ -277,6 +287,7 @@ export default function FormationPage() {
           ))}
         </div>
 
+        {/* E-learning */}
         <div>
           <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
             E-Learning — Modules en ligne
@@ -290,16 +301,16 @@ export default function FormationPage() {
               >
                 <div className="flex items-center gap-4">
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: 'var(--muted)' }}
                   >
-                    🎬
+                    <Video size={20} style={{ color: 'var(--primary)' }} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-sm truncate">{m.title}</div>
                     <div className="flex items-center gap-3 mt-1">
-                      <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                        ⏱ {m.duration}
+                      <span className="text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                        <Clock3 size={12} /> {m.duration}
                       </span>
                       <span
                         className="text-xs px-2 py-0.5 rounded-full"
@@ -311,6 +322,17 @@ export default function FormationPage() {
                         {m.level}
                       </span>
                     </div>
+                    {m.lienVideo && (
+                      <a
+                        href={m.lienVideo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-semibold mt-1 inline-block"
+                        style={{ color: 'var(--primary)' }}
+                      >
+                        ▶ Voir la vidéo
+                      </a>
+                    )}
                   </div>
                   <div className="text-right flex-shrink-0">
                     <div className="text-xs font-bold" style={{ color: 'var(--primary)' }}>

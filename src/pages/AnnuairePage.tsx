@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Building2, MapPin, Phone } from 'lucide-react'
 
 const regions = [
   { name: 'Centre', count: 198, pct: 41 },
@@ -23,6 +24,8 @@ const SECTEUR_LABELS: Record<string, string> = {
   mixte: 'Mixte',
 }
 
+// Traduit les champs de l'API Django (nom, prenom, telephone, date_inscription...)
+// vers le format attendu par ce composant (name, phone, inscrit...)
 function adapterPraticien(p: any) {
   return {
     id: p.id,
@@ -62,8 +65,11 @@ export default function AnnuairePage() {
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      <div style={{ backgroundColor: '#1C2B3A' }} className="px-6 py-16">
-        <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#7BAFD4' }}>
             Annuaire Officiel
           </p>
@@ -80,6 +86,7 @@ export default function AnnuairePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-10">
+        {/* Stats row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
             { label: 'Praticiens inscrits', value: '487', sub: 'au 01/07/2025' },
@@ -107,6 +114,7 @@ export default function AnnuairePage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left: regional chart */}
           <div>
             <h2 className="text-lg font-bold mb-5" style={{ fontFamily: 'var(--font-heading)' }}>
               Répartition par Région
@@ -137,7 +145,9 @@ export default function AnnuairePage() {
             </div>
           </div>
 
+          {/* Right: directory */}
           <div className="lg:col-span-2">
+            {/* Search & filters */}
             <div className="flex flex-wrap gap-3 mb-6">
               <input
                 type="text"
@@ -223,14 +233,14 @@ export default function AnnuairePage() {
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                        <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                          🏥 {d.cabinet}
+                        <span className="text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                          <Building2 size={12} /> {d.cabinet}
                         </span>
-                        <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                          📍 {d.ville}, {d.region}
+                        <span className="text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                          <MapPin size={12} /> {d.ville}, {d.region}
                         </span>
-                        <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                          📞 {d.phone}
+                        <span className="text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                          <Phone size={12} /> {d.phone}
                         </span>
                       </div>
                     </div>

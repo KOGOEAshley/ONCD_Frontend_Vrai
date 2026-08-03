@@ -1,3 +1,5 @@
+import { Scale, ClipboardList, GraduationCap, Handshake, Globe, BarChart3 } from 'lucide-react'
+
 const governance = [
   { role: 'Président', name: 'Dr. Adama Kaboré', region: 'Centre' },
   { role: 'Vice-Président', name: 'Dr. Fatimata Ouédraogo', region: 'Hauts-Bassins' },
@@ -9,32 +11,32 @@ const governance = [
 
 const missions = [
   {
-    icon: '⚖️',
+    icon: Scale,
     title: 'Régulation de la Profession',
     desc: "Vérification des titres et aptitudes des praticiens, inscription au tableau de l'Ordre, contrôle de l'exercice légal.",
   },
   {
-    icon: '📋',
+    icon: ClipboardList,
     title: 'Déontologie & Éthique',
     desc: "Élaboration et mise à jour du code de déontologie, gestion des litiges entre praticiens et patients, instances disciplinaires.",
   },
   {
-    icon: '🎓',
+    icon: GraduationCap,
     title: 'Formation Continue',
     desc: 'Organisation de congrès, ateliers et programmes DPC pour maintenir le haut niveau de compétences des praticiens.',
   },
   {
-    icon: '🤝',
+    icon: Handshake,
     title: 'Représentation Institutionnelle',
     desc: 'Représentation de la profession auprès des pouvoirs publics, des organisations internationales et des partenaires.',
   },
   {
-    icon: '🌍',
+    icon: Globe,
     title: 'Santé Publique',
     desc: "Promotion de la santé bucco-dentaire nationale, campagnes de sensibilisation, partenariats avec le Ministère de la Santé.",
   },
   {
-    icon: '📊',
+    icon: BarChart3,
     title: 'Annuaire Officiel',
     desc: 'Tenue du tableau officiel des chirurgiens-dentistes inscrits et habilités à exercer sur le territoire burkinabè.',
   },
@@ -87,7 +89,7 @@ export default function InstitutionPage() {
                 className="p-6 rounded-xl"
                 style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
               >
-                <div className="text-3xl mb-4">{m.icon}</div>
+                <m.icon size={30} className="mb-4" style={{ color: 'var(--primary)' }} strokeWidth={1.75} />
                 <h3 className="font-semibold text-sm mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
                   {m.title}
                 </h3>

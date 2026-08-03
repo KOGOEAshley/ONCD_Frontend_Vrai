@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Star, Clock3, ArrowRight } from 'lucide-react'
 
 function formaterDate(dateIso: string) {
   const d = new Date(dateIso)
@@ -45,8 +46,11 @@ export default function ActualitesPage() {
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      <div style={{ backgroundColor: '#1C1A17' }} className="px-6 py-16">
-        <div className="max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#1C1A17', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#B8A890' }}>
             Centre de Veille
           </p>
@@ -63,6 +67,7 @@ export default function ActualitesPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Featured */}
         {uneArticle && (
           <div
             className="rounded-2xl mb-12 overflow-hidden cursor-pointer hover:shadow-xl transition-all group"
@@ -75,10 +80,10 @@ export default function ActualitesPage() {
             <div className="p-8 md:p-10">
               <div className="flex items-center gap-3 mb-4">
                 <span
-                  className="text-xs font-bold px-3 py-1 rounded-full"
+                  className="text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1"
                   style={{ backgroundColor: '#E8F5EC', color: '#2A6B3E' }}
                 >
-                  ⭐ À la une
+                  <Star size={12} /> À la une
                 </span>
                 <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
                   {uneArticle.date}
@@ -93,13 +98,14 @@ export default function ActualitesPage() {
               <p className="text-sm leading-relaxed mb-6 max-w-3xl" style={{ color: 'var(--muted-foreground)' }}>
                 {uneArticle.contenu || uneArticle.extrait}
               </p>
-              <button className="text-sm font-semibold cursor-pointer" style={{ color: 'var(--primary)' }}>
-                Lire l'article complet →
+              <button className="text-sm font-semibold cursor-pointer flex items-center gap-1" style={{ color: 'var(--primary)' }}>
+                Lire l'article complet <ArrowRight size={14} />
               </button>
             </div>
           </div>
         )}
 
+        {/* Filters */}
         <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
           <h2 className="text-2xl font-bold" style={{ fontFamily: 'var(--font-heading)' }}>
             Toutes les actualités
@@ -143,8 +149,8 @@ export default function ActualitesPage() {
                   >
                     {a.categorie}
                   </span>
-                  <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                    ⏱ {a.lecture}
+                  <span className="text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+                    <Clock3 size={12} /> {a.lecture}
                   </span>
                 </div>
                 <h3
@@ -160,8 +166,8 @@ export default function ActualitesPage() {
                   <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
                     {a.date}
                   </span>
-                  <span className="text-xs font-semibold group-hover:underline" style={{ color: 'var(--primary)' }}>
-                    Lire →
+                  <span className="text-xs font-semibold group-hover:underline flex items-center gap-1" style={{ color: 'var(--primary)' }}>
+                    Lire <ArrowRight size={12} />
                   </span>
                 </div>
               </div>

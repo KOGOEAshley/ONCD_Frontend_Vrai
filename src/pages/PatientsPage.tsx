@@ -77,8 +77,10 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
       {/* Header */}
-      <div style={{ backgroundColor: '#5C2A0E' }} className="px-6 py-16">
-        <div className="max-w-7xl mx-auto">
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#5C2A0E', opacity: 0.88 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#E8956A' }}>
             Information Citoyenne
           </p>
