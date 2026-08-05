@@ -405,8 +405,10 @@ export default function ComptePage() {
 
   if (!isLoggedIn) {
     return (
-      <div style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--background)' }} className="min-h-screen flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md">
+      <div style={{ fontFamily: 'var(--font-body)' }} className="relative min-h-screen flex items-center justify-center px-4 py-10 overflow-hidden">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: 'var(--background)', opacity: 0.5 }} />
+        <div className="relative w-full max-w-md">
           <div className="text-center mb-8">
             <img
               src="/logo-oncdbf.png"

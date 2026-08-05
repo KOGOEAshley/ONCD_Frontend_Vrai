@@ -81,24 +81,20 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         className="relative overflow-hidden"
         style={{ backgroundColor: 'var(--primary)', minHeight: '540px' }}
       >
-        {/* Background pattern */}
+        {/* Photo en plein fond, balayage révélé de gauche à droite */}
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 animate-wipe-reveal-left"
           style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, #1A7A8E 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, #C4622D 0%, transparent 40%)`,
+            backgroundImage: "url('/bg-dentiste.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}
         />
+        {/* Dégradé sombre côté texte, plus léger côté compteurs, pour garder tout lisible */}
         <div
-          className="absolute right-0 top-0 bottom-0 w-1/2 opacity-5"
+          className="absolute inset-0"
           style={{
-            backgroundImage: `repeating-linear-gradient(
-              45deg,
-              white 0px,
-              white 1px,
-              transparent 1px,
-              transparent 24px
-            )`,
+            background: 'linear-gradient(90deg, rgba(14,79,102,0.55) 0%, rgba(14,79,102,0.35) 45%, rgba(14,79,102,0.1) 100%)',
           }}
         />
 
@@ -113,7 +109,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             </div>
             <h1
               className="text-5xl lg:text-6xl font-bold leading-tight text-white mb-6"
-              style={{ fontFamily: 'var(--font-heading)' }}
+              style={{ fontFamily: 'var(--font-heading)', textShadow: '0 2px 12px rgba(0,0,0,0.35)' }}
             >
               Ensemble pour
               <br />
@@ -147,26 +143,13 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
 
           {/* Stats */}
-          <div className="relative rounded-xl overflow-hidden min-h-[420px]">
-            {/* Image de fond, balayage révélé de gauche à droite */}
-            <div
-              className="absolute inset-0 animate-wipe-reveal-left"
-              style={{
-                backgroundImage: "url('/hero-stats-bg.jpg')",
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-              }}
-            />
-            {/* Voile sombre pour garder le texte lisible par-dessus l'image */}
-            <div className="absolute inset-0" style={{ backgroundColor: 'rgba(12,58,60,0.6)' }} />
-
-            <div className="relative h-full flex items-center p-6">
-              <div className="grid grid-cols-2 gap-3 w-full animate-slide-in-right">
+          <div className="relative flex items-center p-6 animate-slide-in-right">
+            <div className="grid grid-cols-2 gap-3 w-full">
               {stats.map((stat) => (
                 <div
                   key={stat.label}
                   className="rounded-lg p-3.5 backdrop-blur-sm"
-                  style={{ backgroundColor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)' }}
+                  style={{ backgroundColor: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)' }}
                 >
                   <stat.icon size={18} className="text-white/70 mb-1.5" strokeWidth={1.75} />
                   <div
@@ -178,7 +161,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   <div className="text-xs text-white/60 leading-tight">{stat.label}</div>
                 </div>
               ))}
-              </div>
             </div>
           </div>
         </div>

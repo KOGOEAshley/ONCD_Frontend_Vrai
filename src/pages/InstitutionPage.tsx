@@ -1,13 +1,22 @@
+import { useState, useEffect } from 'react'
 import { Scale, ClipboardList, GraduationCap, Handshake, Globe, BarChart3 } from 'lucide-react'
 
-const governance = [
-  { role: 'Président', name: 'Dr. Adama Kaboré', region: 'Centre' },
-  { role: 'Vice-Président', name: 'Dr. Fatimata Ouédraogo', region: 'Hauts-Bassins' },
-  { role: 'Secrétaire Général', name: 'Dr. Ibrahim Traoré', region: 'Centre-Ouest' },
-  { role: 'Trésorier', name: 'Dr. Aminata Sawadogo', region: 'Centre-Nord' },
-  { role: 'Conseiller', name: 'Dr. Paul Compaoré', region: 'Est' },
-  { role: 'Conseiller', name: 'Dr. Marie Zongo', region: 'Boucle du Mouhoun' },
-]
+const API_BASE = 'http://127.0.0.1:8000'
+
+function urlFichier(chemin: string | null | undefined) {
+  if (!chemin) return null
+  return chemin.startsWith('http') ? chemin : `${API_BASE}${chemin}`
+}
+
+function adapterMembre(m: any) {
+  return {
+    id: m.id,
+    name: m.nom,
+    role: m.fonction,
+    region: m.region,
+    photoUrl: urlFichier(m.photo),
+  }
+}
 
 const missions = [
   {
@@ -53,11 +62,22 @@ const timeline = [
 ]
 
 export default function InstitutionPage() {
+  const [governance, setGovernance] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch(`${API_BASE}/api/conseil/`)
+      .then((res) => res.json())
+      .then((data) => setGovernance(data.map(adapterMembre)))
+      .catch((err) => console.error('Erreur API conseil :', err))
+  }, [])
+
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
       {/* Header */}
-      <div style={{ backgroundColor: 'var(--primary)' }} className="px-6 py-16">
-        <div className="max-w-7xl mx-auto">
+      <div className="relative overflow-hidden px-6 py-16">
+        <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+        <div className="absolute inset-0" style={{ backgroundColor: 'var(--primary)', opacity: 0.45 }} />
+        <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#E8956A' }}>
             Qui sommes-nous ?
           </p>
@@ -112,16 +132,24 @@ export default function InstitutionPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {governance.map((member) => (
               <div
-                key={member.name}
+                key={member.id}
                 className="flex items-center gap-4 p-5 rounded-xl"
                 style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
               >
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-                  style={{ backgroundColor: 'var(--primary)' }}
-                >
-                  {member.name.split(' ').pop()?.charAt(0)}
-                </div>
+                {member.photoUrl ? (
+                  <img
+                    src={member.photoUrl}
+                    alt={member.name}
+                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                  />
+                ) : (
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+                    style={{ backgroundColor: 'var(--primary)' }}
+                  >
+                    {member.name.split(' ').pop()?.charAt(0)}
+                  </div>
+                )}
                 <div>
                   <div className="font-semibold text-sm">{member.name}</div>
                   <div className="text-xs font-medium" style={{ color: 'var(--accent)' }}>

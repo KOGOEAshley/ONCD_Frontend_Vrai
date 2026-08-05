@@ -68,7 +68,7 @@ export default function AnnuairePage() {
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.88 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.45 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#7BAFD4' }}>
             Annuaire Officiel
