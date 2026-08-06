@@ -54,7 +54,7 @@ export default function FormationPage() {
   const types = ['Tous', 'Congrès', 'Atelier', 'Webinaire', 'DPC']
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/evenements/')
+    fetch('/api/evenements/')
       .then((res) => res.json())
       .then((data) => setEvents(data.map(adapterEvenement)))
       .catch((err) => console.error('Erreur API événements :', err))
@@ -65,7 +65,7 @@ export default function FormationPage() {
   const [messageModule, setMessageModule] = useState<Record<number, string>>({})
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/modules-elearning/')
+    fetch('/api/modules-elearning/')
       .then((res) => res.json())
       .then((data) => setElearning(data.map(adapterModule)))
       .catch((err) => console.error('Erreur API modules e-learning :', err))
@@ -78,7 +78,7 @@ export default function FormationPage() {
       return
     }
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/modules-elearning/${moduleId}/inscrire/`, {
+      const res = await fetch(`/api/modules-elearning/${moduleId}/inscrire/`, {
         method: 'POST',
         headers: { Authorization: `Token ${token}` },
       })

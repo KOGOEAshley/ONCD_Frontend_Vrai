@@ -68,7 +68,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [news, setNews] = useState<any[]>([])
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/actualites/')
+    fetch('/api/actualites/')
       .then((res) => res.json())
       .then((data) => setNews(data.slice(0, 3).map(adapterNews)))
       .catch((err) => console.error('Erreur API actualités :', err))

@@ -35,7 +35,7 @@ export default function ActualitesPage() {
   const allCats = ['Tous', ...Array.from(new Set(articles.map((a) => a.categorie)))]
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/actualites/')
+    fetch('/api/actualites/')
       .then((res) => res.json())
       .then((data) => setArticles(data.map(adapterActualite)))
       .catch((err) => console.error('Erreur API actualités :', err))

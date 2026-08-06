@@ -48,7 +48,7 @@ export default function AnnuairePage() {
   const [secteurFilter, setSecteurFilter] = useState('Tous')
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/praticiens/')
+    fetch('/api/praticiens/')
       .then((res) => res.json())
       .then((data) => setDentists(data.map(adapterPraticien)))
       .catch((err) => console.error('Erreur API praticiens :', err))

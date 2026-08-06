@@ -38,7 +38,7 @@ export default function GeolocalisationPage() {
   const [searchVille, setSearchVille] = useState('')
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/cliniques/')
+    fetch('/api/cliniques/')
       .then((res) => res.json())
       .then((data) => setCliniques(data.map(adapterClinique)))
       .catch((err) => console.error('Erreur API cliniques :', err))

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { CalendarDays, MapPin, Building2, ArrowRight, CheckCircle2, Globe, Mail } from 'lucide-react'
 
-const API_BASE = 'http://127.0.0.1:8000'
+const API_BASE = ''
 
 function urlFichier(chemin: string | null | undefined) {
   if (!chemin) return null

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Scale, ClipboardList, GraduationCap, Handshake, Globe, BarChart3 } from 'lucide-react'
 
-const API_BASE = 'http://127.0.0.1:8000'
+const API_BASE = ''
 
 function urlFichier(chemin: string | null | undefined) {
   if (!chemin) return null

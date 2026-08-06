@@ -5,7 +5,7 @@ import {
   AlertTriangle, ArrowRight, Download, Lock,
 } from 'lucide-react'
 
-const API_BASE = 'http://127.0.0.1:8000'
+const API_BASE = ''
 
 function urlFichier(chemin: string) {
   return chemin.startsWith('http') ? chemin : `${API_BASE}${chemin}`
