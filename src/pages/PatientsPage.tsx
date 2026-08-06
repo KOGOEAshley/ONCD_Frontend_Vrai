@@ -14,7 +14,7 @@ const conseils = [
     title: 'Brossage quotidien',
     desc: '2 fois par jour, 2 minutes, avec une brosse à poils souples. Remplacez votre brosse tous les 3 mois.',
     color: '#E8F5EC',
-    textColor: '#9A4EAE',
+    textColor: '#6C3082',
   },
   {
     icon: Waves,

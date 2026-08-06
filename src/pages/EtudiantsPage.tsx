@@ -302,7 +302,7 @@ export default function EtudiantsPage() {
                   <div className="flex items-center gap-4">
                     <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                      style={{ backgroundColor: r.type === 'PDF' ? '#C4622D' : '#9A4EAE' }}
+                      style={{ backgroundColor: r.type === 'PDF' ? '#C4622D' : '#6C3082' }}
                     >
                       {r.type}
                     </div>

@@ -780,7 +780,7 @@ export default function ComptePage() {
                     formations.map((p) => (
                       <div key={p.id} className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#9A4EAE' }}>PDF</div>
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#6C3082' }}>PDF</div>
                           <div>
                             <div className="font-medium text-sm">{p.formation.nom}</div>
                             <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>

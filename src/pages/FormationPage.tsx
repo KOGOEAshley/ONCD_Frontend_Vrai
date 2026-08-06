@@ -127,7 +127,7 @@ export default function FormationPage() {
             <div
               key={event.id}
               className="rounded-2xl mb-12 overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #9A4EAE 0%, #175E72 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
+              style={{ background: 'linear-gradient(135deg, #6C3082 0%, #175E72 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
             >
               <div className="p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
                 <div className="flex-1">

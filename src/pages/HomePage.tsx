@@ -18,7 +18,7 @@ const profileCards = [
     subtitle: 'Chirurgien-Dentiste',
     description: 'Gérez vos démarches administratives, cotisations et accédez aux ressources professionnelles.',
     cta: 'Espace Praticien',
-    bg: '#9A4EAE',
+    bg: '#6C3082',
     accent: '#1A7A8E',
   },
   {
@@ -90,13 +90,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             backgroundPosition: 'center',
           }}
         />
-        {/* Dégradé sombre côté texte, plus léger côté compteurs, pour garder tout lisible */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(90deg, rgba(154,78,174,0.4) 0%, rgba(154,78,174,0.22) 45%, rgba(154,78,174,0.05) 100%)',
-          }}
-        />
 
         <div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
           <div>
@@ -117,7 +110,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <br />
               dentaire
             </h1>
-            <p className="text-lg text-white/70 leading-relaxed mb-8 max-w-lg">
+            <p className="text-lg text-white/70 leading-relaxed mb-8 max-w-lg" style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}>
               L'Ordre National des Chirurgiens-Dentistes du Burkina Faso — régulation, formation et promotion de la santé orale depuis 1985.
             </p>
             <div className="flex flex-wrap gap-3">

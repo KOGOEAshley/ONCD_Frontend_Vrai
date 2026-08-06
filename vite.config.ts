@@ -34,6 +34,16 @@ export default defineConfig(({ mode }) => {
       port: parseInt(process.env.PORT || '8443'),
       strictPort: true,
       watch: { ignored: ['**/.figma/**'] },
+      // En développement local uniquement : redirige automatiquement les appels
+      // /api, /admin, /media, /static vers le backend Django (port 8000),
+      // pour que le même code (adresses relatives) fonctionne aussi bien en
+      // local qu'en production, sans jamais avoir à changer d'adresse à la main.
+      proxy: {
+        '/api': 'http://127.0.0.1:8000',
+        '/admin': 'http://127.0.0.1:8000',
+        '/media': 'http://127.0.0.1:8000',
+        '/static': 'http://127.0.0.1:8000',
+      },
     },
     preview: {
       host: '0.0.0.0',

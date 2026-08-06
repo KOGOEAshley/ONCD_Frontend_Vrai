@@ -129,7 +129,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#9A4EAE', opacity: 0.25 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#6C3082', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90C4A0' }}>
             Espace Professionnel
@@ -333,7 +333,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
                       <div className="flex items-center gap-3">
                         <div
                           className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                          style={{ backgroundColor: doc.type === 'PDF' ? '#C4622D' : '#9A4EAE' }}
+                          style={{ backgroundColor: doc.type === 'PDF' ? '#C4622D' : '#6C3082' }}
                         >
                           {doc.type}
                         </div>
