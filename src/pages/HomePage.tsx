@@ -18,7 +18,7 @@ const profileCards = [
     subtitle: 'Chirurgien-Dentiste',
     description: 'Gérez vos démarches administratives, cotisations et accédez aux ressources professionnelles.',
     cta: 'Espace Praticien',
-    bg: '#0C4A5A',
+    bg: '#9A4EAE',
     accent: '#1A7A8E',
   },
   {
@@ -68,7 +68,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [news, setNews] = useState<any[]>([])
 
   useEffect(() => {
-    fetch('/api/actualites/')
+    fetch('http://127.0.0.1:8000/api/actualites/')
       .then((res) => res.json())
       .then((data) => setNews(data.slice(0, 3).map(adapterNews)))
       .catch((err) => console.error('Erreur API actualités :', err))
@@ -94,7 +94,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(90deg, rgba(14,79,102,0.55) 0%, rgba(14,79,102,0.35) 45%, rgba(14,79,102,0.1) 100%)',
+            background: 'linear-gradient(90deg, rgba(154,78,174,0.4) 0%, rgba(154,78,174,0.22) 45%, rgba(154,78,174,0.05) 100%)',
           }}
         />
 

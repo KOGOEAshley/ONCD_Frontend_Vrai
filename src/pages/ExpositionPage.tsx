@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { CalendarDays, MapPin, Building2, ArrowRight, CheckCircle2, Globe, Mail } from 'lucide-react'
 
-const API_BASE = ''
+const API_BASE = 'http://127.0.0.1:8000'
 
 function urlFichier(chemin: string | null | undefined) {
   if (!chemin) return null
@@ -89,7 +89,7 @@ export default function ExpositionPage() {
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #2A1A0E 0%, #5C2A0E 100%)', opacity: 0.45 }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #2A1A0E 0%, #5C2A0E 100%)', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#E8956A' }}>
             Innovation & Équipements

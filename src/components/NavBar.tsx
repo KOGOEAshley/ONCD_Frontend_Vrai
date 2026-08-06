@@ -40,6 +40,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  // Ferme le menu "Plus" si on clique n'importe où en dehors de lui
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -55,13 +56,13 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
       style={{ fontFamily: 'var(--font-body)', backgroundColor: 'var(--primary)' }}
       className="sticky top-0 z-50 shadow-lg"
     >
+      {/* Top bar */}
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
           <p className="text-white/60 text-xs">
             Ordre National des Chirurgiens-Dentistes du Burkina Faso
           </p>
           <div className="flex items-center gap-4">
-            <span className="text-white/60 text-xs">+226 25 30 XX XX</span>
             <button
               onClick={() => onNavigate('compte')}
               className="text-xs text-white bg-white/10 hover:bg-white/20 transition-colors px-3 py-1 rounded-full cursor-pointer"
@@ -73,8 +74,10 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
         </div>
       </div>
 
+      {/* Main nav */}
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+          {/* Logo */}
           <button
             onClick={() => onNavigate('home')}
             className="flex items-center gap-3 cursor-pointer group"
@@ -95,6 +98,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
             </div>
           </button>
 
+          {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-1">
             {navItems.slice(0, 7).map((item) => (
               <button
@@ -136,6 +140,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
             </div>
           </div>
 
+          {/* Mobile toggle */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="lg:hidden text-white/80 hover:text-white p-2 cursor-pointer"
@@ -145,6 +150,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
         </div>
       </div>
 
+      {/* Mobile menu */}
       {menuOpen && (
         <div className="lg:hidden border-t border-white/10 max-w-7xl mx-auto px-4 pb-4">
           <div className="grid grid-cols-2 gap-1 pt-3">

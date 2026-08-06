@@ -54,7 +54,7 @@ export default function FormationPage() {
   const types = ['Tous', 'Congrès', 'Atelier', 'Webinaire', 'DPC']
 
   useEffect(() => {
-    fetch('/api/evenements/')
+    fetch('http://127.0.0.1:8000/api/evenements/')
       .then((res) => res.json())
       .then((data) => setEvents(data.map(adapterEvenement)))
       .catch((err) => console.error('Erreur API événements :', err))
@@ -65,7 +65,7 @@ export default function FormationPage() {
   const [messageModule, setMessageModule] = useState<Record<number, string>>({})
 
   useEffect(() => {
-    fetch('/api/modules-elearning/')
+    fetch('http://127.0.0.1:8000/api/modules-elearning/')
       .then((res) => res.json())
       .then((data) => setElearning(data.map(adapterModule)))
       .catch((err) => console.error('Erreur API modules e-learning :', err))
@@ -78,7 +78,7 @@ export default function FormationPage() {
       return
     }
     try {
-      const res = await fetch(`/api/modules-elearning/${moduleId}/inscrire/`, {
+      const res = await fetch(`http://127.0.0.1:8000/api/modules-elearning/${moduleId}/inscrire/`, {
         method: 'POST',
         headers: { Authorization: `Token ${token}` },
       })
@@ -102,7 +102,7 @@ export default function FormationPage() {
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#2A3E6B', opacity: 0.45 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#2A3E6B', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90A8D4' }}>
             Développement Professionnel
@@ -127,7 +127,7 @@ export default function FormationPage() {
             <div
               key={event.id}
               className="rounded-2xl mb-12 overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #0C4A5A 0%, #175E72 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
+              style={{ background: 'linear-gradient(135deg, #9A4EAE 0%, #175E72 100%)', border: '1px solid rgba(255,255,255,0.1)' }}
             >
               <div className="p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start">
                 <div className="flex-1">

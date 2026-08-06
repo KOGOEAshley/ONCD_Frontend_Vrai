@@ -4,7 +4,7 @@ import {
   Download, Video, Play, Clock,
 } from 'lucide-react'
 
-const API_BASE = ''
+const API_BASE = 'http://127.0.0.1:8000'
 
 const REGIONS = [
   'Centre', 'Hauts-Bassins', 'Centre-Ouest', 'Centre-Nord', 'Sahel', 'Est',
@@ -67,6 +67,7 @@ export default function ComptePage() {
   const [attestationErreur, setAttestationErreur] = useState('')
 
   const [formations, setFormations] = useState<any[]>([])
+  const [cotisation, setCotisation] = useState<any>(null)
   const [formationEnCours, setFormationEnCours] = useState<number | null>(null)
   const [formationsErreur, setFormationsErreur] = useState('')
 
@@ -105,6 +106,7 @@ export default function ComptePage() {
         setIsLoggedIn(true)
         if (donneesPraticien.statut === 'actif') {
           fetchMesFormations()
+          fetchMaCotisation()
           fetchMesModules()
         }
       })
@@ -141,6 +143,7 @@ export default function ComptePage() {
         setPraticien(donneesPraticien)
         if (donneesPraticien.statut === 'actif') {
           fetchMesFormations()
+          fetchMaCotisation()
           fetchMesModules()
         }
       }
@@ -288,6 +291,19 @@ export default function ComptePage() {
     }
   }
 
+  async function fetchMaCotisation() {
+    try {
+      const res = await fetch(`${API_BASE}/api/ma-cotisation/`, {
+        headers: { Authorization: `Token ${getToken()}` },
+      })
+      if (res.ok) {
+        setCotisation(await res.json())
+      }
+    } catch (err) {
+      // silencieux : la carte affichera simplement "—" si l'appel échoue
+    }
+  }
+
   async function fetchMesModules() {
     setModulesErreur('')
     try {
@@ -407,7 +423,7 @@ export default function ComptePage() {
     return (
       <div style={{ fontFamily: 'var(--font-body)' }} className="relative min-h-screen flex items-center justify-center px-4 py-10 overflow-hidden">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: 'var(--background)', opacity: 0.5 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: 'var(--background)', opacity: 0.3 }} />
         <div className="relative w-full max-w-md">
           <div className="text-center mb-8">
             <img
@@ -670,7 +686,43 @@ export default function ComptePage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
               {[
-                { label: 'Cotisation 2025', value: 'À jour', sub: 'Payé le 15 Jan 2025', icon: CheckCircle2, color: '#E8F5EC', textColor: '#2A6B3E' },
+                (() => {
+                  const statutInfo: Record<string, { color: string; textColor: string }> = {
+                    payee: { color: '#E8F5EC', textColor: '#2A6B3E' },
+                    en_attente: { color: '#E8EDF5', textColor: '#2A3E6B' },
+                    en_retard: { color: '#FDEADE', textColor: '#C4622D' },
+                  }
+                  const infos = cotisation && cotisation.generee
+                    ? statutInfo[cotisation.statut] || statutInfo.en_attente
+                    : statutInfo.en_attente
+
+                  let valeur = '—'
+                  let sousTexte = 'Chargement...'
+                  if (cotisation) {
+                    if (!cotisation.generee) {
+                      valeur = 'Non générée'
+                      sousTexte = "Contactez le secrétariat de l'Ordre"
+                    } else if (cotisation.statut === 'payee') {
+                      valeur = 'À jour'
+                      sousTexte = cotisation.date_paiement ? `Payé le ${cotisation.date_paiement}` : 'Payée'
+                    } else if (cotisation.statut === 'en_retard') {
+                      valeur = 'En retard'
+                      sousTexte = `Échéance dépassée (${cotisation.date_echeance})`
+                    } else {
+                      valeur = 'En attente'
+                      sousTexte = `${cotisation.montant?.toLocaleString('fr-FR')} FCFA avant le ${cotisation.date_echeance}`
+                    }
+                  }
+
+                  return {
+                    label: `Cotisation ${cotisation?.annee || new Date().getFullYear()}`,
+                    value: valeur,
+                    sub: sousTexte,
+                    icon: CheckCircle2,
+                    color: infos.color,
+                    textColor: infos.textColor,
+                  }
+                })(),
                 { label: 'Heures DPC', value: '14 / 20h', sub: 'Objectif annuel', icon: GraduationCap, color: '#E8EDF5', textColor: '#2A3E6B' },
                 { label: 'Prochain événement', value: 'Congrès ONCD', sub: '14–16 Nov 2025', icon: CalendarDays, color: '#FEF3E8', textColor: '#875A00' },
               ].map((s) => (
@@ -728,7 +780,7 @@ export default function ComptePage() {
                     formations.map((p) => (
                       <div key={p.id} className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}>
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#0C4A5A' }}>PDF</div>
+                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: '#9A4EAE' }}>PDF</div>
                           <div>
                             <div className="font-medium text-sm">{p.formation.nom}</div>
                             <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>

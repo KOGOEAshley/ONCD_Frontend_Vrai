@@ -48,7 +48,7 @@ export default function AnnuairePage() {
   const [secteurFilter, setSecteurFilter] = useState('Tous')
 
   useEffect(() => {
-    fetch('/api/praticiens/')
+    fetch('http://127.0.0.1:8000/api/praticiens/')
       .then((res) => res.json())
       .then((data) => setDentists(data.map(adapterPraticien)))
       .catch((err) => console.error('Erreur API praticiens :', err))
@@ -68,7 +68,7 @@ export default function AnnuairePage() {
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.45 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#7BAFD4' }}>
             Annuaire Officiel

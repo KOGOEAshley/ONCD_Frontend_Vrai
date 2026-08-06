@@ -5,7 +5,7 @@ import {
   AlertTriangle, ArrowRight, Download, Lock,
 } from 'lucide-react'
 
-const API_BASE = ''
+const API_BASE = 'http://127.0.0.1:8000'
 
 function urlFichier(chemin: string) {
   return chemin.startsWith('http') ? chemin : `${API_BASE}${chemin}`
@@ -126,9 +126,10 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
 
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
+      {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#0C4A5A', opacity: 0.45 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#9A4EAE', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90C4A0' }}>
             Espace Professionnel
@@ -145,6 +146,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
         </div>
       </div>
 
+      {/* Alert */}
       <div
         className="px-6 py-3 text-sm flex items-center gap-3"
         style={{ backgroundColor: '#FEF3E8', borderBottom: '1px solid #F6D5AF' }}
@@ -158,6 +160,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Services grid */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
             Vos services en ligne
@@ -198,6 +201,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
           </div>
         </div>
 
+        {/* Tabs section */}
         <div ref={tabsRef}>
           <div className="flex gap-1 p-1 rounded-xl mb-8 flex-wrap" style={{ backgroundColor: 'var(--muted)' }}>
             {tabs.map((tab) => (
@@ -318,8 +322,8 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
                   </p>
                 ) : (
                   documentsJuridiques.map((doc) => (
-                    
-                     <a key={doc.id}
+                    <a
+                      key={doc.id}
                       href={doc.url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -329,7 +333,7 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
                       <div className="flex items-center gap-3">
                         <div
                           className="w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                          style={{ backgroundColor: doc.type === 'PDF' ? '#C4622D' : '#0C4A5A' }}
+                          style={{ backgroundColor: doc.type === 'PDF' ? '#C4622D' : '#9A4EAE' }}
                         >
                           {doc.type}
                         </div>

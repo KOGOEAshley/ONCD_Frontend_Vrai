@@ -46,7 +46,7 @@ export default function EtudiantsPage() {
   const [stages, setStages] = useState<any[]>([])
 
   useEffect(() => {
-    fetch('/api/stages/')
+    fetch('http://127.0.0.1:8000/api/stages/')
       .then((res) => res.json())
       .then((data) => setStages(data.map(adapterStage)))
       .catch((err) => console.error('Erreur API stages :', err))
@@ -84,7 +84,7 @@ export default function EtudiantsPage() {
       donnees.append('message', candidature.message)
       if (cvFile) donnees.append('cv', cvFile)
 
-      const res = await fetch('/api/postuler-stage/', {
+      const res = await fetch('http://127.0.0.1:8000/api/postuler-stage/', {
         method: 'POST',
         body: donnees,
       })
@@ -109,7 +109,7 @@ export default function EtudiantsPage() {
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#2A3E6B', opacity: 0.45 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#2A3E6B', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#90A8D4' }}>
             Futurs Chirurgiens-Dentistes
@@ -302,7 +302,7 @@ export default function EtudiantsPage() {
                   <div className="flex items-center gap-4">
                     <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-                      style={{ backgroundColor: r.type === 'PDF' ? '#C4622D' : '#0C4A5A' }}
+                      style={{ backgroundColor: r.type === 'PDF' ? '#C4622D' : '#9A4EAE' }}
                     >
                       {r.type}
                     </div>

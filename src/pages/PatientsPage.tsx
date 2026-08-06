@@ -14,7 +14,7 @@ const conseils = [
     title: 'Brossage quotidien',
     desc: '2 fois par jour, 2 minutes, avec une brosse à poils souples. Remplacez votre brosse tous les 3 mois.',
     color: '#E8F5EC',
-    textColor: '#0C4A5A',
+    textColor: '#9A4EAE',
   },
   {
     icon: Waves,
@@ -79,7 +79,7 @@ export default function PatientsPage({ onNavigate }: PatientsPageProps) {
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#5C2A0E', opacity: 0.45 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#5C2A0E', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#E8956A' }}>
             Information Citoyenne

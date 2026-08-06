@@ -38,7 +38,7 @@ export default function GeolocalisationPage() {
   const [searchVille, setSearchVille] = useState('')
 
   useEffect(() => {
-    fetch('/api/cliniques/')
+    fetch('http://127.0.0.1:8000/api/cliniques/')
       .then((res) => res.json())
       .then((data) => setCliniques(data.map(adapterClinique)))
       .catch((err) => console.error('Erreur API cliniques :', err))
@@ -54,7 +54,7 @@ export default function GeolocalisationPage() {
       {/* Header */}
       <div className="relative overflow-hidden px-6 py-14">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.45 }} />
+        <div className="absolute inset-0" style={{ backgroundColor: '#1C2B3A', opacity: 0.25 }} />
         <div className="relative max-w-7xl mx-auto">
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#7BAFD4' }}>
             Carte Interactive
