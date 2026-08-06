@@ -91,17 +91,20 @@ const services = [
   },
 ]
 
-const cotisations = [
-  { category: 'Chirurgien-Dentiste libéral', montant: '75 000 FCFA', echeance: '31 Mars 2025', statut: 'À jour' },
-  { category: 'Salarié secteur public', montant: '50 000 FCFA', echeance: '31 Mars 2025', statut: 'À jour' },
-  { category: 'Salarié secteur privé', montant: '60 000 FCFA', echeance: '31 Mars 2025', statut: 'En attente' },
-  { category: 'Exercice mixte', montant: '85 000 FCFA', echeance: '31 Mars 2025', statut: 'À jour' },
-]
+function adapterBareme(b: any) {
+  return {
+    id: b.id,
+    category: b.secteur_display,
+    montant: `${b.montant.toLocaleString('fr-FR')} FCFA`,
+    echeance: `31 Mars ${new Date().getFullYear()}`,
+  }
+}
 
 export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
   const [activeTab, setActiveTab] = useState('inscription')
   const tabsRef = useRef<HTMLDivElement>(null)
   const [documentsJuridiques, setDocumentsJuridiques] = useState<any[]>([])
+  const [cotisations, setCotisations] = useState<any[]>([])
 
   useEffect(() => {
     fetch(`${API_BASE}/api/bibliotheque/`)
@@ -114,9 +117,15 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
       .catch((err) => console.error('Erreur API bibliothèque :', err))
   }, [])
 
+  useEffect(() => {
+    fetch(`${API_BASE}/api/bareme-cotisations/`)
+      .then((res) => res.json())
+      .then((data) => setCotisations(data.map(adapterBareme)))
+      .catch((err) => console.error('Erreur API barème :', err))
+  }, [])
+
   return (
     <div style={{ fontFamily: 'var(--font-body)' }}>
-      {/* Header */}
       <div className="relative overflow-hidden px-6 py-16">
         <div className="absolute inset-0" style={{ backgroundImage: "url('/page-header-bg.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
         <div className="absolute inset-0" style={{ backgroundColor: '#0C4A5A', opacity: 0.45 }} />
@@ -136,7 +145,6 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
         </div>
       </div>
 
-      {/* Alert */}
       <div
         className="px-6 py-3 text-sm flex items-center gap-3"
         style={{ backgroundColor: '#FEF3E8', borderBottom: '1px solid #F6D5AF' }}
@@ -150,7 +158,6 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Services grid */}
         <div className="mb-16">
           <h2 className="text-2xl font-bold mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
             Vos services en ligne
@@ -191,7 +198,6 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
           </div>
         </div>
 
-        {/* Tabs section */}
         <div ref={tabsRef}>
           <div className="flex gap-1 p-1 rounded-xl mb-8 flex-wrap" style={{ backgroundColor: 'var(--muted)' }}>
             {tabs.map((tab) => (
@@ -222,13 +228,12 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
                       <th className="text-left px-6 py-3.5 text-xs font-semibold">Catégorie</th>
                       <th className="text-left px-6 py-3.5 text-xs font-semibold">Montant</th>
                       <th className="text-left px-6 py-3.5 text-xs font-semibold">Échéance</th>
-                      <th className="text-left px-6 py-3.5 text-xs font-semibold">Statut</th>
                     </tr>
                   </thead>
                   <tbody>
                     {cotisations.map((row, i) => (
                       <tr
-                        key={row.category}
+                        key={row.id}
                         style={{ backgroundColor: i % 2 === 0 ? 'var(--card)' : 'var(--muted)' }}
                       >
                         <td className="px-6 py-4 font-medium text-sm">{row.category}</td>
@@ -237,17 +242,6 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
                         </td>
                         <td className="px-6 py-4 text-xs" style={{ color: 'var(--muted-foreground)' }}>
                           {row.echeance}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                            style={{
-                              backgroundColor: row.statut === 'À jour' ? '#E8F5EC' : '#FDEADE',
-                              color: row.statut === 'À jour' ? '#2A6B3E' : '#C4622D',
-                            }}
-                          >
-                            {row.statut}
-                          </span>
                         </td>
                       </tr>
                     ))}
@@ -324,8 +318,8 @@ export default function PraticienPage({ onNavigate }: { onNavigate: (page: Page)
                   </p>
                 ) : (
                   documentsJuridiques.map((doc) => (
-                    <a
-                      key={doc.id}
+                    
+                     <a key={doc.id}
                       href={doc.url}
                       target="_blank"
                       rel="noopener noreferrer"
