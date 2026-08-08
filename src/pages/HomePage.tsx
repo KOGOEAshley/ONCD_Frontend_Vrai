@@ -5,6 +5,7 @@ import {
   Stethoscope, GraduationCap, Users, MapPin, Landmark, Smile,
   CalendarDays, Store, BarChart3, Newspaper, ArrowRight,
 } from 'lucide-react'
+import HeroBackground from '../components/HeroBackground'
 
 interface HomePageProps {
   onNavigate: (page: Page) => void
@@ -82,14 +83,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         style={{ backgroundColor: 'var(--primary)', minHeight: '540px' }}
       >
         {/* Photo en plein fond, balayage révélé de gauche à droite */}
-        <div
-          className="absolute inset-0 animate-wipe-reveal-left"
-          style={{
-            backgroundImage: "url('/bg-dentiste.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+        <HeroBackground />
 
         <div className="relative max-w-7xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
           <div>
