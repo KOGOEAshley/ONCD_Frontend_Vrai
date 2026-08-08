@@ -46,7 +46,7 @@ export default function EtudiantsPage() {
   const [stages, setStages] = useState<any[]>([])
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/stages/')
+    fetch('/api/stages/')
       .then((res) => res.json())
       .then((data) => setStages(data.map(adapterStage)))
       .catch((err) => console.error('Erreur API stages :', err))
@@ -84,7 +84,7 @@ export default function EtudiantsPage() {
       donnees.append('message', candidature.message)
       if (cvFile) donnees.append('cv', cvFile)
 
-      const res = await fetch('http://127.0.0.1:8000/api/postuler-stage/', {
+      const res = await fetch('/api/postuler-stage/', {
         method: 'POST',
         body: donnees,
       })

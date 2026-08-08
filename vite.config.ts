@@ -39,10 +39,10 @@ export default defineConfig(({ mode }) => {
       // pour que le même code (adresses relatives) fonctionne aussi bien en
       // local qu'en production, sans jamais avoir à changer d'adresse à la main.
       proxy: {
-        '/api': 'http://127.0.0.1:8000',
-        '/admin': 'http://127.0.0.1:8000',
-        '/media': 'http://127.0.0.1:8000',
-        '/static': 'http://127.0.0.1:8000',
+        '/api': '',
+        '/admin': '',
+        '/media': '',
+        '/static': '',
       },
     },
     preview: {

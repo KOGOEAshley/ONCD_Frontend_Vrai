@@ -4,7 +4,7 @@ import {
   Download, Video, Play, Clock,
 } from 'lucide-react'
 
-const API_BASE = 'http://127.0.0.1:8000'
+const API_BASE = ''
 
 const REGIONS = [
   'Centre', 'Hauts-Bassins', 'Centre-Ouest', 'Centre-Nord', 'Sahel', 'Est',
