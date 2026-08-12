@@ -23,8 +23,8 @@ export type HeroBackgroundConfig =
   | { type: 'video'; url: string; poster?: string }
 
 export const HERO_BACKGROUND: HeroBackgroundConfig = {
-  type: 'video',
-  url: '/dentiste_video.mp4',
+  type: 'image',
+  url: '/bg-dentiste.jpg',
 }
 
 function ImageFond({ url }: { url: string }) {

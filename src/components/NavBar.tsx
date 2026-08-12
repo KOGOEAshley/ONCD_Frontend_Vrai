@@ -76,7 +76,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
 
       {/* Main nav */}
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <button
             onClick={() => onNavigate('home')}
@@ -104,7 +104,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
               <button
                 key={item.page}
                 onClick={() => onNavigate(item.page)}
-                className={`text-xs px-3 py-2 rounded-md transition-all cursor-pointer ${
+                className={`text-sm px-3 py-2 rounded-md transition-all cursor-pointer ${
                   currentPage === item.page
                     ? 'bg-white/20 text-white font-semibold'
                     : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -116,7 +116,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}
-                className="text-xs px-3 py-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer flex items-center gap-1"
+                className="text-sm px-3 py-2 rounded-md text-white/70 hover:text-white hover:bg-white/10 transition-all cursor-pointer flex items-center gap-1"
               >
                 Plus <ChevronDown size={14} />
               </button>

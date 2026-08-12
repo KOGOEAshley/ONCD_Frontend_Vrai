@@ -33,7 +33,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h4 className="text-white text-sm font-semibold mb-4 uppercase tracking-widest text-xs">
               Institution
             </h4>
-            <ul className="space-y-2 text-sm text-white/60">
+            <ul className="space-y-2 text-base text-white/60">
               {[
                 ['Notre histoire', 'institution'],
                 ['Gouvernance', 'institution'],
@@ -56,7 +56,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h4 className="text-white text-sm font-semibold mb-4 uppercase tracking-widest text-xs">
               Espaces
             </h4>
-            <ul className="space-y-2 text-sm text-white/60">
+            <ul className="space-y-2 text-base text-white/60">
               {[
                 ['Praticiens', 'praticien'],
                 ['Étudiants', 'etudiants'],
@@ -79,14 +79,14 @@ export default function Footer({ onNavigate }: FooterProps) {
             <h4 className="text-white text-sm font-semibold mb-4 uppercase tracking-widest text-xs">
               Contact
             </h4>
-            <ul className="space-y-2 text-sm text-white/60">
+            <ul className="space-y-2 text-base text-white/60">
               <li className="flex items-center gap-2"><MapPin size={14} /> Ouagadougou, Burkina Faso</li>
               <li className="flex items-center gap-2"><Phone size={14} /> +226 25 30 XX XX</li>
               <li className="flex items-center gap-2"><Mail size={14} /> contact@oncd-bf.org</li>
               <li className="pt-2">
                 <button
                   onClick={() => onNavigate('compte')}
-                  className="text-xs px-4 py-2 rounded-full text-white cursor-pointer transition-colors flex items-center gap-1.5"
+                  className="text-sm px-4 py-2 rounded-full text-white cursor-pointer transition-colors flex items-center gap-1.5"
                   style={{ backgroundColor: 'var(--accent)' }}
                 >
                   Espace Membre <ArrowRight size={14} />

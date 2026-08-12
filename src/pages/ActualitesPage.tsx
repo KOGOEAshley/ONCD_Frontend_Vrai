@@ -17,6 +17,7 @@ function adapterActualite(a: any) {
     auteur: a.auteur,
     lecture: a.temps_lecture,
     aLaUne: a.a_la_une,
+    imageUrl: a.image || null,
   }
 }
 
@@ -95,6 +96,13 @@ export default function ActualitesPage() {
               >
                 {uneArticle.titre}
               </h2>
+              {uneArticle.imageUrl && (
+                <img
+                  src={uneArticle.imageUrl}
+                  alt={uneArticle.titre}
+                  className="w-full h-64 md:h-80 object-cover rounded-xl mb-6"
+                />
+              )}
               <p className="text-sm leading-relaxed mb-6 max-w-3xl" style={{ color: 'var(--muted-foreground)' }}>
                 {uneArticle.contenu || uneArticle.extrait}
               </p>
@@ -159,6 +167,13 @@ export default function ActualitesPage() {
                 >
                   {a.titre}
                 </h3>
+                {a.imageUrl && (
+                  <img
+                    src={a.imageUrl}
+                    alt={a.titre}
+                    className="w-full h-36 object-cover rounded-lg mb-3"
+                  />
+                )}
                 <p className="text-xs leading-relaxed mb-4" style={{ color: 'var(--muted-foreground)' }}>
                   {a.extrait}
                 </p>
